@@ -1,0 +1,143 @@
+#import "@preview/nth:0.2.0": nth
+
+#let today = {datetime.today()};
+#let ndaysfromnow(n) = {
+  let today = datetime.today();
+  let newdate = today.ordinal() + n;
+  let year = today.year();
+  let leapyear = calc.rem(year, 4);
+  
+  if (newdate <= 0) and (newdate + 365 > 0) {
+    year = year - 1;
+    if leapyear != 0 {
+      newdate = 365 + newdate;
+    } else {
+      newdate = 366 + newdate;
+    }
+  }
+
+  if leapyear != 0 {
+    if (newdate > 365) and (newdate < 731) {
+      newdate = newdate - 365;
+      year = year + 1;
+    }
+  } else {
+    if (newdate > 366) and (newdate < 732) {
+      newdate = newdate - 366;
+      year = year + 1;
+    }
+  }
+  
+  let monthdays = (
+    31, //Jan
+    if  leapyear !=0 {28} else {29}, //Feb
+    31, //Mar
+    30, //Apr
+    31, //May
+    30, //Jun
+    31, //Jul
+    31, //Aug
+    30, //Sep
+    31, //Oct
+    30, //Nov
+    31  //Dec
+  )
+  
+  let monthnum = 0;
+  let daynum = newdate;
+  
+  if (newdate > 730) or (newdate + 365 < 0) {
+      text(red)[*The package currently only works for that the expected date is Between January 1st of last year and December 31 of the next year.*];
+      return {today}
+  } else {
+    while monthdays.at(monthnum) < daynum {
+      daynum = daynum - monthdays.at(monthnum);
+      monthnum = monthnum + 1;
+    }
+  }
+   return {datetime(
+      year: year,
+      month: monthnum + 1,
+      day: daynum,
+    )}
+}
+
+
+#let tomorrow = {ndaysfromnow(1)}
+
+#let todaysweekday = {datetime.today().weekday()}
+
+#let monday = {
+  ndaysfromnow(1-todaysweekday)
+}
+#let tuesday = {
+  ndaysfromnow(2-todaysweekday)
+}
+#let wednesday = {
+  ndaysfromnow(3-todaysweekday)
+}
+#let thursday = {
+  ndaysfromnow(4-todaysweekday)
+}
+#let friday = {
+  ndaysfromnow(5-todaysweekday)
+}
+
+#let nextmonday = {
+  ndaysfromnow(8-todaysweekday)
+}
+#let nexttuesday = {
+  ndaysfromnow(9-todaysweekday)
+}
+#let nextwednesday = {
+  ndaysfromnow(10-todaysweekday)
+}
+#let nextthursday = {
+  ndaysfromnow(11-todaysweekday)
+}
+#let nextfriday = {
+  ndaysfromnow(12-todaysweekday)
+}
+
+#let nameweekday(date) = {
+("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").at(date.weekday()-1)
+}
+
+#let namemonth(date) = {
+("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ).at(date - 1)
+}
+
+// pattern: s or L = 
+// region: date display convention
+#let datedisp(
+  weekdayname: true, 
+  numerical: false, 
+  region: "en-US",
+  body
+) = {
+  if type(body) != "datetime" { 
+    body 
+  } else { 
+    if weekdayname {
+      nameweekday(body)
+      [,]
+      h(0.25em)
+    }
+    if region == "en-US" {
+          if numerical {
+            body.display("[month]/[day]/[year]")
+          } else [
+              #namemonth(body.month())
+              #nth(body.day()),
+              #body.year()
+           ]
+    }
+    if region == "zh-CN" {
+      if numberical {
+        body.display("[year]/[month]/[day]/")
+      } else {
+        body.display("[year] 年 [month] 月 [day] 日")
+      }
+    }
+  }
+}
