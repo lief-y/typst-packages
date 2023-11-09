@@ -110,7 +110,7 @@
 // pattern: s or L = 
 // region: date display convention
 #let datedisp(
-  weekdayname: true, 
+  weekdayname: true,
   numerical: false, 
   region: "en-US",
   body
