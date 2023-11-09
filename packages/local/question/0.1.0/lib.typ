@@ -32,10 +32,9 @@
   total_points.update(t => t + points)
   box(
       // stroke: blue,
-      inset: 4pt,
+      inset: 2pt,
       radius: 0.2em,
-      fill: rgb("#98e3fd").lighten(50%),
-      height: 1.2em
+      fill: rgb("#98e3fd").lighten(50%)
     )[
         #set align(center + horizon)
         #set text(weight: "regular")

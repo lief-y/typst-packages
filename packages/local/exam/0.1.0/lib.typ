@@ -17,9 +17,9 @@
   rhead: "",
   lfoot: "", 
   rfoot: "",
-  intro: [Answer all questions in *pen* and pay attention to *neat handwriting*!],  // used to display a hint about clean writing and if grammar is valued, etc...
+  intro: none,  // used to display a hint about clean writing and if grammar is valued, etc...
   sol: false, // show solutions
-  namebox:true, // show name and grade box
+  namebox: true, // show name and grade box
   body
 ) = {
   // Set page, headers and footers for the main body
@@ -141,10 +141,10 @@
   // Main body.
 
   // Text settings
-  set text(12pt)
+  // set text(12pt)
   
   // Set paragraph spacing.
-  show par: set block(above: 1.2em, below: 1.2em)
+  // show par: set block(above: 1em, below: 1em)
 
   show heading.where(level: 2): it => {
     set block(above: 1.2em, below: 1em)
