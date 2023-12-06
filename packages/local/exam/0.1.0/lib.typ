@@ -25,44 +25,38 @@
   // Set page, headers and footers for the main body
   set page(
     header: {
+        set text(12pt, weight: "bold")
        if college != "" {
          align(center)[#college];
        } else {}
        grid(
           columns: (6em, 1fr, 6em),
           // rows: (1em),
-          align(left)[
-            #if lhead != none {
-              strong[
-                #if lhead != "" {lhead} else {"Fall 2023"}
-              ]
+          align(left, 
+            if lhead != none {
+                if lhead != "" {lhead} else {"Fall 2023"}
             }
-          ],
-          align(center)[
-              #text(16pt, weight: "bold")[
+          ),
+          align(center, text(16pt)[
                 #if chead != "" {chead} else [#course --- #kind]
               ]
-          ],
-          align(right)[
-            #if rhead != none {
-              strong[
-                #if rhead != "" {rhead} else {"Ver." + version}
-              ]
+          ),
+          align(right, 
+            if rhead != none {
+                if rhead != "" {rhead} else {"Ver." + version}
             }
-          ]
+          )
         )
         v(-0.5em)
         line(length: 100%); v(-1em)
     },
     footer: {
-      set text(11.5pt, weight: 500)
+      set text(10pt, weight: "bold")
       grid(
         columns:(1fr, 5em, 1fr),
         align(left)[
           #if lfoot != none {
-            strong[
-              #if lfoot != "" { lfoot } else { datedisp(date) }
-            ]
+            if lfoot != "" { lfoot } else { datedisp(date) }
           }
         ],
         align(center)[
@@ -70,9 +64,7 @@
         ],
         align(right)[
           #if rfoot != none {
-            strong[
-              #if rfoot != "" {rfoot} else { instructor }
-            ]
+            if rfoot != "" {rfoot} else { instructor }
           }
         ]
       )
