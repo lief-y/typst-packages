@@ -25,7 +25,8 @@
   // Set page, headers and footers for the main body
   set page(
     header: {
-        set text(12pt, weight: "bold")
+      set block(spacing: 0.5em)
+      set text(12pt, weight: "bold")
        if college != "" {
          align(center)[#college];
        } else {}
@@ -47,9 +48,9 @@
             }
           )
         )
-        v(-0.5em)
-        line(length: 100%); v(-1em)
+        line(length: 100%);
     },
+    header-ascent: 10%,
     footer: {
       set text(10pt, weight: "bold")
       grid(
