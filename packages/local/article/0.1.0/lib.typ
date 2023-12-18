@@ -8,8 +8,8 @@
         email: "abc@univ.edu",
         url: "https://abc.edu",
       ),
-  // bibstyle: "din-1505-2-alphanumeric.csl",
-  // bibfile: none,
+  bibstyle: "din-1505-2-alphanumeric.csl",
+  bib: none,
   body,
 ) = {
   let names = authors.map(author => author.name)
@@ -79,13 +79,10 @@
 //   set enum(indent: 1.5em, body-indent: 1.2em)
 
   // Configure citation and bibliography styles.
-  // Display the bibliography, if any is given.
-  // if bibfile == none {
-  //   set bibliography(
-  //     style: bibstyle, 
-  //     title: text(weight: 500, [References])
-  //   )
-  // }
+   set bibliography(
+    style: bibstyle, 
+    title: text(weight: 500, [References])
+  )
 
   // Configure equations.
   // show math.equation: set block(below: 0.75em, above: 0.8em)
@@ -113,10 +110,12 @@
 
   set par(first-line-indent: 0pt)
 
-// if bibfile != none {
-//   set text(size: 10pt)
-//   bibliography(bibfile)
-// }
+ // Display the bibliography, if any is given.
+
+if bib != none {
+  set text(size: 10pt)
+  bib
+}
 
   // The thing ends with details about the authors.
   // show: pad.with(x: 1.2em)
