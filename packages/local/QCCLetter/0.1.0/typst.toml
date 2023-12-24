@@ -1,0 +1,4 @@
+[package]
+name = "QCCLetter"
+version = "0.1.0"
+entrypoint = "lib.typ"
