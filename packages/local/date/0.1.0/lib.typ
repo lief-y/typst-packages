@@ -1,10 +1,8 @@
 #import "@preview/nth:0.2.0": nth
 
-#let today = {datetime.today()};
-#let ndaysfromnow(n) = {
-  let today = datetime.today();
-  let newdate = today.ordinal() + n;
-  let year = today.year();
+#let ndaysfromdate(n, date: datetime.today()) = {
+  let newdate = date.ordinal() + n;
+  let year = date.year();
   let leapyear = calc.rem(year, 4);
   
   if (newdate <= 0) and (newdate + 365 > 0) {
@@ -55,7 +53,7 @@
       monthnum = monthnum + 1;
     }
   }
-   return {datetime(
+  return {datetime(
       year: year,
       month: monthnum + 1,
       day: daynum,
@@ -63,40 +61,40 @@
 }
 
 
-#let tomorrow = {ndaysfromnow(1)}
+#let tomorrow = {ndaysfromdate(1)}
 
 #let todaysweekday = {datetime.today().weekday()}
 
 #let monday = {
-  ndaysfromnow(1-todaysweekday)
+  ndaysfromdate(1-todaysweekday)
 }
 #let tuesday = {
-  ndaysfromnow(2-todaysweekday)
+  ndaysfromdate(2-todaysweekday)
 }
 #let wednesday = {
-  ndaysfromnow(3-todaysweekday)
+  ndaysfromdate(3-todaysweekday)
 }
 #let thursday = {
-  ndaysfromnow(4-todaysweekday)
+  ndaysfromdate(4-todaysweekday)
 }
 #let friday = {
-  ndaysfromnow(5-todaysweekday)
+  ndaysfromdate(5-todaysweekday)
 }
 
 #let nextmonday = {
-  ndaysfromnow(8-todaysweekday)
+  ndaysfromdate(8-todaysweekday)
 }
 #let nexttuesday = {
-  ndaysfromnow(9-todaysweekday)
+  ndaysfromdate(9-todaysweekday)
 }
 #let nextwednesday = {
-  ndaysfromnow(10-todaysweekday)
+  ndaysfromdate(10-todaysweekday)
 }
 #let nextthursday = {
-  ndaysfromnow(11-todaysweekday)
+  ndaysfromdate(11-todaysweekday)
 }
 #let nextfriday = {
-  ndaysfromnow(12-todaysweekday)
+  ndaysfromdate(12-todaysweekday)
 }
 
 #let nameweekday(date) = {
