@@ -31,7 +31,7 @@
          align(center)[#college];
        } else {}
        grid(
-          columns: (6em, 1fr, 6em),
+          columns: (1fr, 4fr, 1fr),
           // rows: (1em),
           align(left, 
             if lhead != none {

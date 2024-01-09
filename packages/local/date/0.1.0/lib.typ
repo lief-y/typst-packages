@@ -141,3 +141,18 @@
     }
   }
 }
+
+#let semester(date) = {
+  let semestername = {
+    if date.month() == 1  {
+      "Winter"
+    } else if date.month() < 6 {
+      "Spring"
+    } else if date.month() < 8  {
+      "Summer"
+    } else {
+      "Fall"
+    }
+  }
+  semestername + " " + str(date.year())
+}
