@@ -111,30 +111,30 @@
   weekdayname: true,
   numerical: false, 
   region: "en-US",
-  body
+  date
 ) = {
-  if type(body) != "datetime" { 
-    body 
+  if type(date) != "datetime" { 
+    date 
   } else { 
     if weekdayname {
-      nameweekday(body)
+      nameweekday(date)
       [,]
       h(0.25em)
     }
     if region == "en-US" {
           if numerical {
-            body.display("[month]/[day]/[year]")
+            date.display("[month]/[day]/[year]")
           } else [
-              #namemonth(body.month())
-              #nth(body.day()),
-              #body.year()
+              #namemonth(date.month())
+              #nth(date.day()),
+              #date.year()
            ]
     }
     if region == "zh-CN" {
       if numberical {
-        body.display("[year]/[month]/[day]/")
+        date.display("[year]/[month]/[day]")
       } else {
-        body.display("[year] 年 [month] 月 [day] 日")
+        date.display("[year] 年 [month] 月 [day] 日")
       }
     }
   }
