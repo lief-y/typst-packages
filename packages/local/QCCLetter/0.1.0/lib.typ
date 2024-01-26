@@ -16,12 +16,14 @@
   // The name with which the letter closes.
   name: none,
 
+  margins: (top: 1.25in, bottom: 1in),
+
   // The letter's content.
   body
 ) = {
   // Configure page and text properties.
   set page(
-    margin: (top: 1.25in, bottom: 1in),
+    margin: margins,
     header: {
       set block(spacing: 0.8em)
       align(center)[
