@@ -142,7 +142,7 @@
 
 #let semester(date) = {
   let semestername = {
-    if date.month() == 1  {
+    if (date.month() == 1 and date.day() <= 25) {
       "Winter"
     } else if date.month() < 6 {
       "Spring"
