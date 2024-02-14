@@ -3,18 +3,18 @@
 #let ndaysfromdate(n, date: datetime.today()) = {
   let newdate = date.ordinal() + n;
   let year = date.year();
-  let leapyear = calc.rem(year, 4);
+  let leapyear = (calc.rem(year, 400) == 0 or (calc.rem(year, 4) == 0 or calc.rem(year, 100) != 0));
   
   if (newdate <= 0) and (newdate + 365 > 0) {
     year = year - 1;
-    if leapyear != 0 {
+    if leapyear {
       newdate = 365 + newdate;
     } else {
       newdate = 366 + newdate;
     }
   }
 
-  if leapyear != 0 {
+  if leapyear {
     if (newdate > 365) and (newdate < 731) {
       newdate = newdate - 365;
       year = year + 1;
@@ -28,7 +28,7 @@
   
   let monthdays = (
     31, //Jan
-    if  leapyear !=0 {28} else {29}, //Feb
+    if  leapyear {29} else {28}, //Feb
     31, //Mar
     30, //Apr
     31, //May
@@ -128,7 +128,7 @@
               #namemonth(date.month())
               #nth(date.day()),
               #date.year()
-           ]
+          ]
     }
     if region == "zh-CN" {
       if numberical {
