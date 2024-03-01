@@ -81,7 +81,7 @@
   // Configure citation and bibliography styles.
    set bibliography(
     style: bibstyle, 
-    title: text(weight: 500, [References])
+    title: text(strong[References])
   )
 
   // Configure equations.
@@ -118,7 +118,7 @@ if bib != none {
   // The thing ends with details about the authors.
   // show: pad.with(x: 1.2em)
   
-  // set text(0.8em)
+  set text(0.8em)
   
   for author in authors {
     let keys = ("department", "organization", "location")
