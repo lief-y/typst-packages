@@ -99,12 +99,10 @@
   )
 
   set par(
-    first-line-indent: 1.2em, 
     justify: true, 
-    leading: 0.58em
   )
 
-  show par: set block(spacing: (1.75*0.58em))
+  // show par: set block(spacing: (1.75*0.58em))
 
   body
 
@@ -120,7 +118,7 @@ if bib != none {
   // The thing ends with details about the authors.
   // show: pad.with(x: 1.2em)
   
-  set text(0.8em)
+  // set text(0.8em)
   
   for author in authors {
     let keys = ("department", "organization", "location")
