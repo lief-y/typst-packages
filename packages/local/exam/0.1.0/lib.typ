@@ -44,7 +44,7 @@
           ),
           align(right, 
             if rhead != none {
-                if rhead != "" {rhead} else {"Ver." + version}
+                if rhead != "" {rhead} else {"Ver. " + version}
             }
           )
         )
