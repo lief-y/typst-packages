@@ -9,6 +9,7 @@
 #let total_points = state("t", 0)
 
 #let qstcounter = counter("question-counter");
+#let bonuscounter = counter("bonus-counter");
 
 /*
   function for the numbering of the questions and questions
@@ -91,6 +92,31 @@
     points
   )
 ]
+
+
+#let bonusquestion(bonus: none, title: "", content) = {
+  if title == "" [
+    #pointgrid({
+      set text(weight: 600)
+      bonuscounter.step()
+      [Bonus Question ] + bonuscounter.display(questionnumbering);
+      set text(weight: "regular")
+      content
+    },
+    bonus
+  )
+  ] else [
+  #pointgrid({
+      set text(weight: 600)
+      bonuscounter.step()
+      [Bonus Question ] + bonuscounter.display(questionnumbering)
+      title
+    },
+    bonus
+  )
+  #pad(left:1em, top:-0.5em)[#content]
+]
+}
 
 /*
   solution for a question
