@@ -28,9 +28,12 @@
   points: given points -> needs to be an integer
   plural: if true it displays an s if more than one point
 */
-#let pointbox(points, plural: false) = {
+
+#let pointbox(points, plural: false, total_include: true) = {
   assert.eq(type(points),"integer")
-  total_points.update(t => t + points)
+  if total_include == true {
+    total_points.update(t => t + points)
+  }
   box(
       // stroke: blue,
       inset: 2pt,
@@ -46,27 +49,33 @@
 /*
   template for a grid to display the pointbox on the right side.
 */
-#let pointgrid(body, points) = {
+#let pointgrid(body, points, bonusqst: false) = {
   grid(
     columns: (100%, 10%),
     gutter: 1em,
     body,
     if points != none {
-        pointbox(points)
+        pointbox(points, total_include: not(bonusqst))
     }
   )
 }
 
-#let question(points: none, title: "", content) = {
+#let question(points: none, title: "", bonus: false, content) = {
   if title == "" [
     #pointgrid({
       set text(weight: 600)
-      qstcounter.step()
-      qstcounter.display(questionnumbering);
+      if bonus == true {
+        bonuscounter.step()
+        [Bonus Question ] + bonuscounter.display(questionnumbering)
+      } else {
+        qstcounter.step()
+        qstcounter.display(questionnumbering)
+      }
       set text(weight: "regular")
       content
     },
-    points
+    points, 
+    bonusqst: bonus
   )
   ] else [
   #pointgrid({
@@ -75,13 +84,13 @@
       qstcounter.display(questionnumbering)
       title
     },
-    points
+    points, bonusqst: bonus
   )
   #pad(left:1em, top:-0.5em)[#content]
 ]
 }
 
-#let part(body, points: none, level: 2) = [
+#let part(body, points: none, bonus: false, level: 2) = [
   #set text(weight: "regular")
   #pointgrid({
       qstcounter.step(level: level)
@@ -89,34 +98,10 @@
       qstcounter.display(questionnumbering)
       body
     },
-    points
+    points,
+    bonusqst: bonus
   )
 ]
-
-
-#let bonusquestion(bonus: none, title: "", content) = {
-  if title == "" [
-    #pointgrid({
-      set text(weight: 600)
-      bonuscounter.step()
-      [Bonus Question ] + bonuscounter.display(questionnumbering);
-      set text(weight: "regular")
-      content
-    },
-    bonus
-  )
-  ] else [
-  #pointgrid({
-      set text(weight: 600)
-      bonuscounter.step()
-      [Bonus Question ] + bonuscounter.display(questionnumbering)
-      title
-    },
-    bonus
-  )
-  #pad(left:1em, top:-0.5em)[#content]
-]
-}
 
 /*
   solution for a question
