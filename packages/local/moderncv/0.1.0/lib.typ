@@ -62,7 +62,7 @@
         columns: (1fr,)*3,
         align: (left, center, right),
         smallcaps[#date],
-        counter(page).display("1 / 1"),
+        counter(page).display("1 / 1", both: true),
         smallcaps[
               #author.firstname
               #author.lastname
