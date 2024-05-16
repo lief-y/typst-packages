@@ -208,22 +208,24 @@
 
 #let resume_list(body) = {
   set text(size: 1em, weight: 400)
-  set par(leading: 0.8em)
+  set par(leading: 1em)
   set enum(numbering: n => {
-      box(width: left_column_width, align(right)[#n.])
+      box(width: left_column_width, height: 1.1em, radius: 0.4em, fill: rgb("#228B22"), align(center + horizon)[  #n  ])
     },
     body-indent: 1.2em
   )
+
   show list.item: it => {
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
       column-gutter: 1.2em,
       row-gutter: 0.5em,
-      $bullet$,
+      circle(radius: 0.2em, fill: rgb("#228B22")),
       it.body
     )
   }
+
   body
 }
 
