@@ -18,7 +18,7 @@
 
 //Resume layout
 
-#let left_column_width = 16%
+#let left_column_width = 18%
 #let column_gutter = 1.2em
 
 #let resume(
@@ -55,14 +55,14 @@
   // Set page style 
   set page(
     paper: "us-letter",
-    margin: (left: 0.8in, right: 0.8in, top: 0.6in, bottom: 0.6in),
+    margin: (left: 0.6in, right: 0.6in, top: 0.6in, bottom: 0.6in),
     footer: [
       #set text(fill: accent_color, size: 8pt)
       #grid(
         columns: (1fr,)*3,
         align: (left, center, right),
         smallcaps[#date],
-        counter(page).display("1 / 1"),
+        counter(page).display("1 / 1", both: true),
         smallcaps[
               #author.firstname
               #author.lastname
@@ -75,7 +75,7 @@
   
   // Set paragraph spacing
   
-  show par: set block(above: 0.8em, below: 1em)
+  show par: set block(above: 1em, below: 1em)
   set par(justify: true)
 
   // Set heading styles
@@ -99,7 +99,7 @@
   }
 
   show heading.where(level: 2): it => {
-    set text(primary_color, size: 1.1em, style: "italic", weight: "regular")
+    set text(primary_color, size: 1.1em, style: "normal", weight: "bold")
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
@@ -112,7 +112,14 @@
 
   show heading.where(level: 3): it => {
     set text(size: 10pt, weight: "regular")
-    smallcaps[#it.body]
+    grid(
+      columns: (left_column_width, 1fr),
+      align: (right, left),
+      column-gutter: 1.2em,
+      row-gutter: 0.5em,
+      [],
+      pad(left: -0.25em, smallcaps[#it.body])
+    )
   }
 
   // Set name style
@@ -229,6 +236,28 @@
   body
 }
 
+#let term_list(body) = {
+  set text(size: 1em, weight: 400)
+  set par(leading: 0.8em)
+  // set terms(item: t => {
+  //     box(width: left_column_width, align(right)[#t])
+  //   },
+  //   body-indent: 1.2em
+  // )
+  show terms.item: it => {
+    grid(
+      columns: (left_column_width, 1fr),
+      align: (right, left),
+      column-gutter: 1.2em,
+      row-gutter: 0.5em,
+      it.term,
+      it.description
+    )
+  }
+  body
+}
+
+
 // Resume entry. Displayed as  date title university\ [] location description
 #let resume_content(body) = {
   grid(
@@ -249,11 +278,12 @@
   location: "", 
   description: ""
 ) = {
+  set block(above: 0.8em, below: 1em)
   grid(
       columns: (left_column_width, auto, 1fr),
       align: (right, left, right),
       column-gutter: 1.2em,
-      row-gutter: 0.65em,
+      row-gutter: 0.5em,
       grid.cell(
         rowspan: 2,
         date,
