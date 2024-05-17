@@ -19,7 +19,7 @@
 //Resume layout
 
 #let left_column_width = 18%
-#let column_gutter = 1.2em
+#let column_gutter = 1em
 
 #let resume(
   title: "",
@@ -34,23 +34,23 @@
     size: 11pt,
     fallback: true
   )
+
+  let primary_color = rgb("#CC5500")
+  let accent_color = rgb("#FFD700")
+
   // Set up theme color
-  let primary_color = {
-    if (theme.color == "") {rgb("#4B0082")}
-    if (theme.color == "blue") { rgb("#0D8FCD") }
-    if (theme.color == "orange") { rgb("#CC5500") }
-  }
-  
-  let accent_color = {
-    if (theme.color == "") {rgb("#228B22")}
-    if (theme.color == "blue") { rgb("#333333") } 
-    if (theme.color == "orange") { rgb("#422921") } 
-  }
-  
+  if theme.primarycolor != "" {
+      primary_color = theme.primarycolor
+  } 
+  if theme.accentcolor != "" {
+      accent_color = theme.accentcolor
+  } 
+
   set document(
     author: author.firstname + " " + author.lastname, 
     title: title,
   )
+
 
   // Set page style 
   set page(
@@ -76,6 +76,7 @@
   // Set paragraph spacing
   
   show par: set block(above: 1em, below: 1em)
+  show par: set block(above: 1em, below: 1em)
   set par(justify: true)
 
   // Set heading styles
@@ -85,31 +86,69 @@
     outlined: false,
   )
 
+  show heading: set block(above: 1em)
+
   show heading.where(level:1): it => {
     set text(
       size: 1.2em,
-      weight: "semibold"
+      weight: "bold",
+      fill: primary_color
     )
     grid(
       columns: (left_column_width, 1fr),
-      column-gutter: 1.2em,
-      align(horizon, line(stroke: 5pt + primary_color, length: 100%)),
-      pad(left: -0.5em, text(fill: primary_color, it.body))
+      column-gutter: column_gutter,
+      align(horizon, line(stroke: 5pt + gradient.linear(primary_color, primary_color.lighten(20%), angle: 0deg), length: 100%)),
+      pad(left: -0.5em, it.body)
     )
   }
+
+  // show heading.where(level: 2): it => {
+  //   set text(
+  //     size: 1.1em, 
+  //     style: "normal", 
+  //     fill: primary_color, 
+  //     weight: "semibold"
+  //   )
+  //   grid(
+  //     columns: (left_column_width, 1fr),
+  //     align: (right, left),
+  //     column-gutter: column_gutter,
+  //     row-gutter: 0.5em,
+  //     [],
+  //     pad(left: -0.25em, it.body)
+  //   )
+  // }
+
+  // show heading.where(level: 3): it => {
+  //   set text(size: 10pt, weight: "regular")
+  //   grid(
+  //     columns: (left_column_width, 1fr),
+  //     align: (right, left),
+  //     column-gutter: column_gutter,
+  //     row-gutter: 0.5em,
+  //     [],
+  //     pad(left: -0.25em, smallcaps[#it.body])
+  //   )
+  // }
+
+  // show heading.where(level:1): it => {
+  //   set text(
+  //     size: 1.2em,
+  //     weight: "semibold", 
+  //     fill: primary_color
+  //   )
+  //     box(
+  //       width: 100%,
+  //       stroke: (bottom: 3pt + gradient.linear(primary_color, white, angle: 0deg)),
+  //       inset: (bottom: 0.5em),
+  //       it.body
+  //     )
+  // }
 
   show heading.where(level: 2): it => {
     set text(primary_color, size: 1.1em, style: "normal", weight: "bold")
-    grid(
-      columns: (left_column_width, 1fr),
-      align: (right, left),
-      column-gutter: 1.2em,
-      row-gutter: 0.5em,
-      [],
-      pad(left: -0.25em, it.body)
-    )
+    it.body
   }
-
   show heading.where(level: 3): it => {
     set text(size: 10pt, weight: "regular")
     grid(
@@ -121,6 +160,37 @@
       pad(left: -0.25em, smallcaps[#it.body])
     )
   }
+
+
+  set enum(
+      numbering: n => {
+          box(
+            baseline: -40%, 
+            width: 0.8em
+          )[
+            #place(
+              dy: -0.25em, 
+              circle(
+                radius: 0.65em, 
+                // height: 1.5em, 
+                fill: gradient.linear(primary_color, primary_color.lighten(20%), angle: 0deg), 
+                align(
+                  center+horizon,
+                  text(fill: white, weight: "bold", size: 0.8em)[#n]
+                )
+              )
+            )
+          ]
+        },
+      body-indent: 1.2em+3pt,
+      spacing: 1.2em,
+      tight: false
+  )
+
+  set list(
+    marker: text(fill: primary_color, weight: "bold", size: 1em)[$bullet$],
+    body-indent: column_gutter
+  )
 
   // Set name style
   
@@ -184,28 +254,29 @@
   }
   
   let socialinfo = {
-      set text(size: 0.9em, weight: "regular", style: "normal")
-      grid(
-          columns: (1fr,) + (auto,)*3,
-          column-gutter: 1.5em,
-          align: (left, right, right, right),
-          [],
-          if (author.web != "") {
-            icon_link(web_icon, "", author.web)
-          },
-          if (author.orcid != "") {
-            icon_link(orcid_icon, orcid_link, author.orcid)
-          },
-          if (author.github != "") {
-            icon_link(github_icon, github_link, author.github)
-          }
+    set text(size: 0.9em, weight: "regular", style: "normal")
+    grid(
+      columns: (1fr,) + (auto,)*3,
+      column-gutter: 1.5em,
+      align: (left, right, right, right),
+      [],
+      if (author.web != "") {
+        icon_link(web_icon, "", author.web)
+      },
+      if (author.orcid != "") {
+        icon_link(orcid_icon, orcid_link, author.orcid)
+      },
+      if (author.github != "") {
+        icon_link(github_icon, github_link, author.github)
+      }
     )
-  } 
+  }
+  
   grid(
-   columns: (1fr,1fr),
-   align: (left, right), 
-   {name; positions;},
-   {address; contactinfo},
+    columns: (1fr, 2fr),
+    align: (left, right), 
+    {name; positions;},
+    {address; contactinfo},
   )
   socialinfo
   body
@@ -215,59 +286,56 @@
 
 #let resume_list(body) = {
   set text(size: 1em, weight: 400)
-  set par(leading: 1em)
-  set enum(numbering: n => {
-      box(width: left_column_width, height: 1.1em, radius: 0.4em, fill: rgb("#228B22"), align(center + horizon)[  #n  ])
-    },
-    body-indent: 1.2em
+  set par(leading: 0.65em)
+
+  set enum(
+    numbering: n => {
+        box(
+          baseline: -40%, 
+          width: left_column_width
+        )[
+          #place(
+            dy: -0.25em, 
+            circle(
+              radius: 0.65em, 
+              // height: 1.5em, 
+              fill: orange, 
+              align(
+                center+horizon,
+                text(fill: white, weight: "bold", size: 0.8em)[#n]
+              )
+            )
+          )
+        ]
+      },
+    body-indent: 1.2em+3pt,
+    spacing: 1.2em,
+    tight: false
   )
 
   show list.item: it => {
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
-      column-gutter: 1.2em,
+      column-gutter: column_gutter,
       row-gutter: 0.5em,
-      circle(radius: 0.2em, fill: rgb("#228B22")),
+      text(size: 1.1em, weight: "black")[$bullet$],
       it.body
     )
   }
 
-  body
-}
-
-#let term_list(body) = {
-  set text(size: 1em, weight: 400)
-  set par(leading: 0.8em)
-  // set terms(item: t => {
-  //     box(width: left_column_width, align(right)[#t])
-  //   },
-  //   body-indent: 1.2em
-  // )
   show terms.item: it => {
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
-      column-gutter: 1.2em,
+      column-gutter: column_gutter,
       row-gutter: 0.5em,
-      it.term,
+      par(justify: true, it.term),
       it.description
     )
   }
+
   body
-}
-
-
-// Resume entry. Displayed as  date title university\ [] location description
-#let resume_content(body) = {
-  grid(
-      columns: (left_column_width, auto, 1fr),
-      align: (right, left, right),
-      column-gutter: 1.2em,
-      row-gutter: 0.5em,
-      [],
-      body
-    )
 }
 
 #let resume_entry(
@@ -282,7 +350,7 @@
   grid(
       columns: (left_column_width, auto, 1fr),
       align: (right, left, right),
-      column-gutter: 1.2em,
+      column-gutter: column_gutter,
       row-gutter: 0.5em,
       grid.cell(
         rowspan: 2,
@@ -301,7 +369,7 @@
 
 #let reverse(it) = {
   let len = it.children.filter(child => child.func() == enum.item).len()
-  set enum(numbering: n => box(width: left_column_width,        align(right)[#(1 + len - n).])
+  set enum(numbering: n => box(width: left_column_width, align(right)[#(1 + len - n).])
   ) 
   it
 }
