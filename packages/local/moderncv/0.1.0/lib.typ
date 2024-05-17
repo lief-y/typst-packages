@@ -1,10 +1,29 @@
 // const icons
-#let icon_size = 0.8em
-#let orcid_icon = box(height: icon_size, image("icons/orcid.svg"))
-#let github_icon = box(height: icon_size, image("icons/github.svg"))
-#let phone_icon = box(height: icon_size, image("icons/phone.svg"))
-#let email_icon = box(height: icon_size, image("icons/email.svg"))
-#let web_icon = box(height: icon_size, image("icons/web.svg"))
+#let icon_size = 1em
+
+#let colored_icon(path: "", color: "", size: icon_size) = {
+  box(
+    baseline: 15%,
+    height: size,
+    if color == "" {
+      image(path)
+    } else {
+      image.decode(
+        read(path).replace(
+          "#CC5500",
+          color.to-hex(),
+        )
+      )
+    }
+  )
+}
+
+#let orchid_icon_path = "icons/orcid.svg"
+#let phone_icon_path = "icons/phone-solid.svg"
+#let email_icon_path = "icons/envelope-solid.svg"
+#let web_icon_path = "icons/globe-solid.svg"
+#let github_icon_path = "icons/github-mark.svg"
+#let bookmark_icon_path = "icons/bookmark-solid.svg"
 
 #let github_link = "https://github.com/"
 #let orcid_link = "https://orcid.org/"
@@ -36,7 +55,7 @@
   )
 
   let primary_color = rgb("#CC5500")
-  let accent_color = rgb("#FFD700")
+  let accent_color = rgb("#2B80FF")
 
   // Set up theme color
   if theme.primarycolor != "" {
@@ -75,7 +94,6 @@
   
   // Set paragraph spacing
   
-  show par: set block(above: 1em, below: 1em)
   show par: set block(above: 1em, below: 1em)
   set par(justify: true)
 
@@ -188,7 +206,8 @@
   )
 
   set list(
-    marker: text(fill: primary_color, weight: "bold", size: 1em)[$bullet$],
+    marker: pad(right: 0.5em, colored_icon(path: bookmark_icon_path, color: accent_color, size: 1em)),
+    // text(fill: primary_color, weight: "bold", size: 1em)[$bullet$],
     body-indent: column_gutter
   )
 
@@ -239,14 +258,14 @@
       #set text(size: 0.8em, weight: "regular", style: "normal")
       #align(horizon)[
         #if (author.phone != "") {
-          phone_icon
+          colored_icon(path: phone_icon_path, color: accent_color)
           box(inset: (left: 6pt),  
             author.phone
           )
         }
         
         #if (author.email != "") {
-          email_icon
+          colored_icon(path: email_icon_path, color: accent_color)
           box(inset: (left: 6pt), link("mailto:" + author.email)[#author.email])
         }
       ]
@@ -261,13 +280,13 @@
       align: (left, right, right, right),
       [],
       if (author.web != "") {
-        icon_link(web_icon, "", author.web)
+        icon_link(colored_icon(path: web_icon_path, color: accent_color), "", author.web)
       },
       if (author.orcid != "") {
-        icon_link(orcid_icon, orcid_link, author.orcid)
+        icon_link(colored_icon(path: orchid_icon_path, color: ""), orcid_link, author.orcid)
       },
       if (author.github != "") {
-        icon_link(github_icon, github_link, author.github)
+        icon_link(colored_icon(path: github_icon_path, color: accent_color), github_link, author.github)
       }
     )
   }
@@ -299,7 +318,7 @@
             circle(
               radius: 0.65em, 
               // height: 1.5em, 
-              fill: orange, 
+              fill: blue, 
               align(
                 center+horizon,
                 text(fill: white, weight: "bold", size: 0.8em)[#n]
@@ -308,10 +327,11 @@
           )
         ]
       },
-    body-indent: 1.2em+3pt,
+    body-indent: 1.2em,
     spacing: 1.2em,
     tight: false
   )
+
 
   show list.item: it => {
     grid(
@@ -319,7 +339,12 @@
       align: (right, left),
       column-gutter: column_gutter,
       row-gutter: 0.5em,
-      text(size: 1.1em, weight: "black")[$bullet$],
+      box(
+          baseline: -40%,
+          inset: (right: 0.5em), 
+          width: left_column_width,
+          colored_icon(path: bookmark_icon_path, color: blue, size: 1em)
+      ),
       it.body
     )
   }
