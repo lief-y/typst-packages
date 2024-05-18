@@ -40,6 +40,16 @@
 #let left_column_width = 18%
 #let column_gutter = 1em
 
+//Resume color
+#let state_primary_color = state(
+  "primarycolor",
+  rgb("#3F3B37")
+)
+#let state_accent_color = state(
+  "accentcolor",
+  rgb("#3F3B37")
+)
+
 #let resume(
   title: "",
   author: (:), 
@@ -54,14 +64,14 @@
     fallback: true
   )
 
-  let primary_color = rgb("#CC5500")
-  let accent_color = rgb("#2B80FF")
-
   // Set up theme color
-  if theme.primarycolor != "" {
+  let primary_color = rgb("#3F3B37")
+  let accent_color = rgb("#3F3B37")
+
+  if theme.primarycolor != none {
       primary_color = theme.primarycolor
   } 
-  if theme.accentcolor != "" {
+  if theme.accentcolor != none {
       accent_color = theme.accentcolor
   } 
 
@@ -69,32 +79,34 @@
     author: author.firstname + " " + author.lastname, 
     title: title,
   )
-
-
   // Set page style 
+
   set page(
     paper: "us-letter",
     margin: (left: 0.6in, right: 0.6in, top: 0.6in, bottom: 0.6in),
-    footer: [
-      #set text(fill: accent_color, size: 8pt)
-      #grid(
-        columns: (1fr,)*3,
+    footer: 
+      {set text(fill: accent_color, size: 8pt);
+      grid(
+        columns: (1fr,1fr,1fr),
         align: (left, center, right),
         smallcaps[#date],
         counter(page).display("1 / 1", both: true),
         smallcaps[
-              #author.firstname
-              #author.lastname
-              #sym.dot.c
-              #title
-            ],
-        )
-    ],
+          #author.firstname
+          #author.lastname
+          #sym.dot.c
+          #title
+        ],
+      )}
   )
-  
+
+
+  state_primary_color.update(primary_color)
+  state_accent_color.update(accent_color)
+
   // Set paragraph spacing
   
-  show par: set block(above: 1em, below: 1em)
+  set block(above: 1em, below: 1.1em)
   set par(justify: true)
 
   // Set heading styles
@@ -106,92 +118,63 @@
 
   show heading: set block(above: 1em)
 
-  show heading.where(level:1): it => {
-    set text(
-      size: 1.2em,
-      weight: "bold",
-      fill: primary_color
-    )
+  show heading.where(level:1): it =>  {
+      set text(
+        size: 1.2em,
+        weight: "bold",
+        fill: primary_color
+      )
+      if theme.style == "grid" {
     grid(
       columns: (left_column_width, 1fr),
       column-gutter: column_gutter,
       align(horizon, line(stroke: 5pt + gradient.linear(primary_color, primary_color.lighten(20%), angle: 0deg), length: 100%)),
       pad(left: -0.5em, it.body)
-    )
+    )} else {
+      box(
+        width: 100%,
+        stroke: (bottom: 3pt + gradient.linear(primary_color, white, angle: 0deg)),
+        inset: (bottom: 0.5em),
+        it.body
+      )
+    }
   }
-
-  // show heading.where(level: 2): it => {
-  //   set text(
-  //     size: 1.1em, 
-  //     style: "normal", 
-  //     fill: primary_color, 
-  //     weight: "semibold"
-  //   )
-  //   grid(
-  //     columns: (left_column_width, 1fr),
-  //     align: (right, left),
-  //     column-gutter: column_gutter,
-  //     row-gutter: 0.5em,
-  //     [],
-  //     pad(left: -0.25em, it.body)
-  //   )
-  // }
-
-  // show heading.where(level: 3): it => {
-  //   set text(size: 10pt, weight: "regular")
-  //   grid(
-  //     columns: (left_column_width, 1fr),
-  //     align: (right, left),
-  //     column-gutter: column_gutter,
-  //     row-gutter: 0.5em,
-  //     [],
-  //     pad(left: -0.25em, smallcaps[#it.body])
-  //   )
-  // }
-
-  // show heading.where(level:1): it => {
-  //   set text(
-  //     size: 1.2em,
-  //     weight: "semibold", 
-  //     fill: primary_color
-  //   )
-  //     box(
-  //       width: 100%,
-  //       stroke: (bottom: 3pt + gradient.linear(primary_color, white, angle: 0deg)),
-  //       inset: (bottom: 0.5em),
-  //       it.body
-  //     )
-  // }
 
   show heading.where(level: 2): it => {
-    set text(primary_color, size: 1.1em, style: "normal", weight: "bold")
-    it.body
-  }
-  show heading.where(level: 3): it => {
-    set text(size: 10pt, weight: "regular")
+    set text(
+      size: 1.1em, 
+      style: "normal", 
+      fill: primary_color, 
+      weight: "semibold"
+    )
+          if theme.style == "grid" {
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
-      column-gutter: 1.2em,
+      column-gutter: column_gutter,
       row-gutter: 0.5em,
       [],
-      pad(left: -0.25em, smallcaps[#it.body])
+      pad(left: -0.25em, it.body)
     )
+          } else {
+            it.body
+          }
   }
-
 
   set enum(
       numbering: n => {
           box(
             baseline: -40%, 
-            width: 0.8em
+            width: {if theme.style == "grid" {left_column_width} else {0.8em}}
           )[
             #place(
-              dy: -0.25em, 
-              circle(
-                radius: 0.65em, 
-                // height: 1.5em, 
-                fill: gradient.linear(primary_color, primary_color.lighten(20%), angle: 0deg), 
+              dy: -0.1em,
+              dx: if theme.style == "grid" {-(column_gutter+0.15em)} else {0em}, 
+              rect(
+                radius: 0.3em,
+                width: 1em,
+                height: 1em, 
+                fill: gradient.linear(accent_color, accent_color.lighten(20%), angle: 0deg), 
                 align(
                   center+horizon,
                   text(fill: white, weight: "bold", size: 0.8em)[#n]
@@ -200,26 +183,20 @@
             )
           ]
         },
-      body-indent: 1.2em+3pt,
+      body-indent: if theme.style == "grid" {-3pt} else {1.2em+3pt},
       spacing: 1.2em,
       tight: false
   )
 
-  set list(
-    marker: pad(right: 0.5em, colored_icon(path: bookmark_icon_path, color: accent_color, size: 1em)),
-    // text(fill: primary_color, weight: "bold", size: 1em)[$bullet$],
-    body-indent: column_gutter
-  )
-
   // Set name style
   
-  let name = {
-    set text(
-      size: 2.5em, 
-      weight: "bold", 
-      fill: primary_color
-    )
-    pad(bottom: 0.5em)[
+  let name =  {
+      set text(
+        size: 2.5em, 
+        weight: "bold", 
+        fill: primary_color
+      )
+    pad(bottom: 0em)[
       #author.firstname
       #h(0.2em)
       #author.lastname
@@ -228,7 +205,7 @@
 
   // Set position style
   
-  let positions = {
+  let positions =  {
     set text(
       accent_color,
       size: 0.8em,
@@ -236,7 +213,7 @@
     )
     smallcaps(
       author.positions.join(
-        text[#"  "#sym.dot.c#"  "]
+        text[\ ]
       )
     )
   }
@@ -258,14 +235,14 @@
       #set text(size: 0.8em, weight: "regular", style: "normal")
       #align(horizon)[
         #if (author.phone != "") {
-          colored_icon(path: phone_icon_path, color: accent_color)
+          {colored_icon(path: phone_icon_path, color: accent_color)}
           box(inset: (left: 6pt),  
             author.phone
           )
         }
         
         #if (author.email != "") {
-          colored_icon(path: email_icon_path, color: accent_color)
+          {colored_icon(path: email_icon_path, color: accent_color)}
           box(inset: (left: 6pt), link("mailto:" + author.email)[#author.email])
         }
       ]
@@ -275,18 +252,18 @@
   let socialinfo = {
     set text(size: 0.9em, weight: "regular", style: "normal")
     grid(
-      columns: (1fr,) + (auto,)*3,
+      columns: (1fr, auto, auto, auto),
       column-gutter: 1.5em,
       align: (left, right, right, right),
       [],
       if (author.web != "") {
-        icon_link(colored_icon(path: web_icon_path, color: accent_color), "", author.web)
+        icon_link({colored_icon(path: web_icon_path, color: accent_color)}, "", author.web)
       },
       if (author.orcid != "") {
         icon_link(colored_icon(path: orchid_icon_path, color: ""), orcid_link, author.orcid)
       },
       if (author.github != "") {
-        icon_link(colored_icon(path: github_icon_path, color: accent_color), github_link, author.github)
+        icon_link({colored_icon(path: github_icon_path, color: accent_color)}, github_link, author.github)
       }
     )
   }
@@ -294,7 +271,7 @@
   grid(
     columns: (1fr, 2fr),
     align: (left, right), 
-    {name; positions;},
+    {name; positions},
     {address; contactinfo},
   )
   socialinfo
@@ -305,58 +282,29 @@
 
 #let resume_list(body) = {
   set text(size: 1em, weight: 400)
-  set par(leading: 0.65em)
-
-  set enum(
-    numbering: n => {
-        box(
-          baseline: -40%, 
-          width: left_column_width
-        )[
-          #place(
-            dy: -0.25em, 
-            circle(
-              radius: 0.65em, 
-              // height: 1.5em, 
-              fill: blue, 
-              align(
-                center+horizon,
-                text(fill: white, weight: "bold", size: 0.8em)[#n]
-              )
-            )
-          )
-        ]
-      },
-    body-indent: 1.2em,
-    spacing: 1.2em,
-    tight: false
-  )
-
-
-  show list.item: it => {
-    grid(
-      columns: (left_column_width, 1fr),
-      align: (right, left),
-      column-gutter: column_gutter,
-      row-gutter: 0.5em,
-      box(
-          baseline: -40%,
-          inset: (right: 0.5em), 
-          width: left_column_width,
-          colored_icon(path: bookmark_icon_path, color: blue, size: 1em)
-      ),
-      it.body
-    )
-  }
 
   show terms.item: it => {
     grid(
       columns: (left_column_width, 1fr),
       align: (right, left),
       column-gutter: column_gutter,
-      row-gutter: 0.5em,
-      par(justify: true, it.term),
+      it.term,
       it.description
+    )
+  }
+
+    show list.item: it => context{
+    grid(
+      columns: (left_column_width, 1fr),
+      align: (right, left),
+      column-gutter: column_gutter,
+      box(
+          baseline: -12.5%,
+          inset: (right: 0.25em), 
+          width: left_column_width,
+          context{colored_icon(path: bookmark_icon_path, color: state_accent_color.get(), size: 0.75em)}
+      ),
+      it.body
     )
   }
 
@@ -371,12 +319,11 @@
   location: "", 
   description: ""
 ) = {
-  set block(above: 0.8em, below: 1em)
   grid(
       columns: (left_column_width, auto, 1fr),
       align: (right, left, right),
       column-gutter: column_gutter,
-      row-gutter: 0.5em,
+      row-gutter: 0.65em,
       grid.cell(
         rowspan: 2,
         date,
@@ -386,16 +333,40 @@
       emph(university),
       location,
       [],
-      description
+      if description != "" {
+        description
+      }
     )
 }
 
 // Reverse the numbering of enum items. It was shared by frozolotl. A reimplement of enum can be found in https://gist.github.com/frozolotl/1eeafa5ff4a38b2aab412743bd9c1ded. It may be used to realize the same feature.
 
-#let reverse(it) = {
+#let reverse(it, style: none) = {
   let len = it.children.filter(child => child.func() == enum.item).len()
-  set enum(numbering: n => box(width: left_column_width, align(right)[#(1 + len - n).])
-  ) 
+  set enum(
+    body-indent: if style == "grid" {-3pt} else {1.2em+3pt},
+    numbering: n => context {
+    box(
+      baseline: -40%, 
+      width: {if style == "grid" {left_column_width} else {0.8em}}
+    )[
+      #place(
+        dy: -0.1em,
+        dx: if style == "grid" {-(column_gutter+0.15em)} else {0em}, 
+        rect(
+          radius: 0.3em,
+          width: 1em,
+          height: 1em, 
+          fill: gradient.linear(state_accent_color.get(), state_accent_color.get().lighten(20%), angle: 0deg), 
+          align(
+            center+horizon,
+            text(fill: white, weight: "bold", size: 0.8em)[#(1 + len - n)]
+          )
+        )
+      )
+    ]
+    }
+  )
   it
 }
 
