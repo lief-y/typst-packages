@@ -44,11 +44,11 @@
 //Resume color
 #let state_primary_color = state(
   "primarycolor",
-  rgb("#3F3B37")
+  rgb("#2e59a7")
 )
 #let state_accent_color = state(
   "accentcolor",
-  rgb("#3F3B37")
+  rgb("#2e59a7")
 )
 
 #let state_headinglayout = state(
@@ -63,9 +63,27 @@
 
 #let resume(
   title: "",
-  author: (:), 
+  author: (
+      firstname: "", 
+      lastname: "",
+      email: "", 
+      address: [],
+      positions: (
+        "",
+      ),
+      phone: "",
+      github: "",
+      orcid: "",
+      web: ""
+  )+(:), 
   date: datetime.today().display("[month repr:long] [day], [year]"), 
-  theme: (:),
+  theme: (
+    headinglayout: "",
+    primarycolor: rgb("#2e59a7"),
+    accentcolor: rgb("#2e59a7"),
+    font: "Noto Sans",
+    liststyle: "fancy"
+    )+(:),
   body
 ) = {
   set text(
@@ -76,15 +94,8 @@
   )
 
   // Set up theme color
-  let primary_color = rgb("#3F3B37")
-  let accent_color = rgb("#3F3B37")
-
-  if theme.primarycolor != none {
-      primary_color = theme.primarycolor
-  } 
-  if theme.accentcolor != none {
-      accent_color = theme.accentcolor
-  } 
+  let primary_color = theme.primarycolor
+  let accent_color = theme.accentcolor
 
   set document(
     author: author.firstname + " " + author.lastname, 
