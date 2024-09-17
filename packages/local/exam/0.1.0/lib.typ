@@ -3,7 +3,6 @@
 
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
 
-
 // The exam function defines how your document looks.
 #let exam(
   kind: "Exam", // indicates the type of exam -> Class Test | Pop Quiz | Short Test
@@ -35,11 +34,11 @@
           // rows: (1em),
           align(left, 
             if lhead != none {
-                if lhead != "" {lhead} else {"Fall 2023"}
+                if lhead != "" {lhead} else {date}
             }
           ),
           align(center, text(16pt)[
-                #if chead != "" {chead} else [#course --- #kind]
+                #if chead != "" {chead} else if course != "" [#course --- #kind] else [#kind]
               ]
           ),
           align(right, 
