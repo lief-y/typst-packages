@@ -149,6 +149,30 @@
     part(points: none)[#it.body]
   }
 
+
+  let inline_list(counter-fmt, it) = {
+    if it.tight {
+      grid(
+        columns: (1fr,) * calc.min(it.children.len(), 4),
+        column-gutter: 0.5em,
+        row-gutter: 1.2em,
+        ..it.children
+            .enumerate()
+            .map(((n, item)) => grid(
+              columns: (auto, 1fr),
+              column-gutter: .5em,
+              counter-fmt(n + 1),
+              item.body,
+            ))
+      )
+    } else {
+      it
+    }
+  }
+
+  // show list: inline-list.with(_ => sym.bullet)
+  show enum: inline_list.with(numbering.with("1)"))
+
   // Content-Body
   body
 
