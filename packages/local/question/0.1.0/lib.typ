@@ -90,11 +90,11 @@
 ]
 }
 
-#let part(body, points: none, bonus: false, level: 2) = [
+#let part(body, points: none, bonus: false, level: 2, indent: false) = [
   #set text(weight: "regular")
   #pointgrid({
       qstcounter.step(level: level)
-      h(1.5em)
+      if indent {h(1.5em)}
       qstcounter.display(questionnumbering)
       body
     },
