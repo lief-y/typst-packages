@@ -1,5 +1,42 @@
-#import "@local/date:0.1.0": *
 #import "@local/question:0.1.0": *
+#import "@preview/nth:0.2.0": nth
+
+#let datedisp(
+  weekdayname: true,
+  date
+) = {
+  if type(date) != "datetime" { 
+    date 
+  } else { 
+    if weekdayname {
+      date.display("[weekday repr:long]")
+      [,]
+      h(0.25em)
+    }
+    [#date.display("[month repr:long]") #nth(date.day()), #date.year()]
+  }
+}
+
+#let semester(date) = {
+  let semestername = {
+    if (date.month() == 1 and date.day() <= 25) {
+      "Winter"
+    } else if date.month() < 6 {
+      "Spring"
+    } else if date.month() < 8  {
+      "Summer"
+    } else {
+      "Fall"
+    }
+  }
+  semestername + " " + str(date.year())
+}
+
+#let lines(count) = {
+    for _ in range(count) {
+        block(spacing: 1.6em, line(length:100%, stroke: rgb("#616A6B")) )
+    }
+}
 
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
 
