@@ -1,8 +1,44 @@
-#import "@local/date:0.1.0": *
 #import "@local/question:0.1.0": *
+#import "@preview/nth:0.2.0": nth
+
+#let datedisp(
+  weekdayname: true,
+  date
+) = {
+  if type(date) != "datetime" { 
+    date 
+  } else { 
+    if weekdayname {
+      date.display("[weekday repr:long]")
+      [,]
+      h(0.25em)
+    }
+    [#date.display("[month repr:long]") #nth(date.day()), #date.year()]
+  }
+}
+
+#let semester(date) = {
+  let semestername = {
+    if (date.month() == 1 and date.day() <= 25) {
+      "Winter"
+    } else if date.month() < 6 {
+      "Spring"
+    } else if date.month() < 8  {
+      "Summer"
+    } else {
+      "Fall"
+    }
+  }
+  semestername + " " + str(date.year())
+}
+
+#let lines(count) = {
+    for _ in range(count) {
+        block(spacing: 1.6em, line(length:100%, stroke: rgb("#616A6B")) )
+    }
+}
 
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
-
 
 // The exam function defines how your document looks.
 #let exam(
@@ -35,11 +71,11 @@
           // rows: (1em),
           align(left, 
             if lhead != none {
-                if lhead != "" {lhead} else {"Fall 2023"}
+                if lhead != "" {lhead} else {date}
             }
           ),
           align(center, text(16pt)[
-                #if chead != "" {chead} else [#course --- #kind]
+                #if chead != "" {chead} else if course != "" [#course --- #kind] else [#kind]
               ]
           ),
           align(right, 
@@ -149,6 +185,30 @@
     set text(weight: "regular")
     part(points: none)[#it.body]
   }
+
+
+  let inline_list(counter-fmt, it) = {
+    if it.tight {
+      grid(
+        columns: (1fr,) * calc.min(it.children.len(), 4),
+        column-gutter: 0.5em,
+        row-gutter: 1.2em,
+        ..it.children
+            .enumerate()
+            .map(((n, item)) => grid(
+              columns: (auto, 1fr),
+              column-gutter: .5em,
+              counter-fmt(n + 1),
+              item.body,
+            ))
+      )
+    } else {
+      it
+    }
+  }
+
+  // show list: inline-list.with(_ => sym.bullet)
+  show enum: inline_list.with(numbering.with("1)"))
 
   // Content-Body
   body
