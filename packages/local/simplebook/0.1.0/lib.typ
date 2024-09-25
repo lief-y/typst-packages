@@ -95,6 +95,7 @@
     ]
   }
 
+  
   // Set page header and footer.
   set page(
     header: context {
@@ -131,7 +132,32 @@
         metadata.where(value: "mainmatter"),
       ).first().location().page()
 
-      // let newchapnumber = if chapter_after.len() >0 {chapter_after.first().location().page()} else {0}
+
+
+      let SectionsBefore = query(
+        selector(heading.where(level: 2)).before(here())
+      )
+
+      let SectionsAfter = query(
+        selector(heading.where(level: 2)).after(here())
+      )
+
+      let PreviousSection = none
+      if SectionsBefore.len() > 0 {PreviousSection = SectionsBefore.last()}
+    
+      let NextSection = none
+      if SectionsAfter.len() > 0 {NextSection = SectionsAfter.first()}
+
+      let CurrentSection = {
+        if NextSection != none and here().page() == NextSection.location().page() {
+        NextSection
+        } else if PreviousSection != none {
+          PreviousSection
+        } else {
+          none
+        }
+      }
+
       
       if EndChapQuery != none and StartChapQuery != none {
         return none
@@ -151,7 +177,9 @@
           },
           chead,
           if rhead == "" {
-            smallcaps(title)
+          if CurrentSection.body == [Exercises] {[Exercises]}  else {
+            counter(heading).at(CurrentSection.location()).map(n => [#n]).join(".")+[: ]+CurrentSection.body
+          }
             // currentheading
           } else {
             rhead
