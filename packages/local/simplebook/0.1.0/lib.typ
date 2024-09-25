@@ -84,13 +84,13 @@
       it.body
   }
 
-  //insert metadata and center heading
+ //insert metadata and center heading
   show heading.where(level: 1): chap => context {
-    metadata("pagebreakbelow")
+    metadata("endchap")
     pagebreak(weak: true, to: "odd")
     align(center)[
       #chap
-      #metadata("h1above")
+      #metadata("startchap")
       #v(0.5em)
     ]
   }
@@ -99,38 +99,47 @@
   set page(
     header: context {
       set text(font: title-font, fill: primary-color)
-
-      let isnewpage = query(
-        metadata.where(value: "pagebreakbelow").before(here()),
+      
+      let EndChapQuery = query(
+        metadata.where(value: "endchap").before(here()),
       ).find(m => {
         m.location().page() == here().page() - 1
       })
 
-      if isnewpage != none {
-        return none
-      }
-
+      let StartChapQuery = query(
+        metadata.where(value: "startchap").after(here()),
+      ).find(m => {
+        m.location().page() == here().page() + 1
+      })
+      
       // Find the heading of chapters and sections in the current location.
       let chapter_before = query(
         selector(heading.where(level: 1)).before(here()),
       )
+      
       let chapter_after = query(
         selector(heading.where(level: 1)).after(here()),
       )
 
       let currentheading = query(
-        metadata.where(value: "h1above"),
-      ).find(h => h.location().page() == here().page())
+        metadata.where(value: "startchap"),
+      ).find(
+        h => h.location().page() == here().page()
+      )
 
       let pagenum_mainmatter = query(
         metadata.where(value: "mainmatter"),
       ).first().location().page()
 
-      if (
-        chapter_before.len() != 0 and chapter_before.last().location().page() >= pagenum_mainmatter and currentheading == none
+      // let newchapnumber = if chapter_after.len() >0 {chapter_after.first().location().page()} else {0}
+      
+      if EndChapQuery != none and StartChapQuery != none {
+        return none
+      } else if (
+        chapter_before.len() > 0 and chapter_before.last().location().page() >= pagenum_mainmatter and currentheading == none
       ) {
         grid(
-          columns: (1fr, 1fr, 1fr),
+          columns: (auto, 1fr, auto),
           align: (left, center, right),
           rows: (1em, auto),
           row-gutter: 0.65em,
@@ -143,6 +152,7 @@
           chead,
           if rhead == "" {
             smallcaps(title)
+            // currentheading
           } else {
             rhead
           },
@@ -151,22 +161,23 @@
       }
     },
     footer: context {
-      let findlastpagebreak = query(
-        metadata.where(value: "pagebreakbelow").before(here()),
+      let EndChapQuery = query(
+        metadata.where(value: "endchap").before(here()),
       ).find(m => {
         m.location().page() == here().page() - 1
       })
+
+      let StartChapQuery = query(
+        metadata.where(value: "startchap").after(here()),
+      ).find(m => {
+        m.location().page() == here().page() + 1
+      })
+      
       let pagenum_mainmatter = query(
         metadata.where(value: "mainmatter"),
       ).first().location().page()
-
-      let isnewpage = false
-      if findlastpagebreak != none and calc.odd(
-        findlastpagebreak.location().page(),
-      ) {
-        isnewpage = true
-      }
-      if isnewpage {
+      
+      if EndChapQuery != none and StartChapQuery != none {
         none
       } else {
         if here().page() < 3 {
@@ -189,7 +200,6 @@
       }
     },
   )
-
 
   set par(justify: true)
 
@@ -243,6 +253,40 @@
       }
     ]
   ]
+
+  // Format Exercises Heading
+  show heading.where(body: [Exercises]): set heading(numbering: none)
+
+  show heading.where(body: [Exercises]): it => {
+      set text(14pt, weight: "bold")
+      box(width: 20%, inset: (bottom: 0.6em), stroke: (bottom: 5pt+blue), it.body)
+  }
+
+  // Inline list
+  let inline_list(counter-fmt, it) = {
+    if it.tight {
+      grid(
+        columns: (1fr,) * calc.min(it.children.len(), 4),
+        column-gutter: 0.5em,
+        row-gutter: 1em,
+        ..it.children
+            .enumerate()
+            .map(((n, item)) => grid(
+              columns: (auto, 1fr),
+              column-gutter: .5em,
+              counter-fmt(n + 1),
+              item.body,
+            ))
+      )
+    } else {
+      it
+    }
+  }
+
+  // // show list: inline-list.with(_ => sym.bullet)
+  // show enum: inline_list.with(numbering.with("1)"))
+  // // set list numbering style
+  // set enum(numbering: "1)", tight: false)
 
 // body includes frontmatter, such as preface and toc, and mainmatter such as main body, bibliography and appendixes.
   body
