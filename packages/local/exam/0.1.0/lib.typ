@@ -63,47 +63,38 @@
     header: {
       set block(spacing: 0.5em)
       set text(12pt, weight: "bold")
-       if college != "" {
-         align(center)[#college];
-       } else {}
-       grid(
-          columns: (1fr, 3fr, 1fr),
-          // rows: (1em),
-          align(left, 
-            if lhead != none {
-                if lhead != "" {lhead} else {date}
-            }
-          ),
-          align(center, text(16pt)[
-                #if chead != "" {chead} else if course != "" [#course --- #kind] else [#kind]
-              ]
-          ),
-          align(right, 
-            if rhead != none {
-                if rhead != "" {rhead} else {"Ver. " + version}
-            }
-          )
-        )
-        line(length: 100%);
+      if college != "" {
+        align(center)[#college];
+      } else {}
+      grid(
+        columns: (1fr, 3fr, 1fr),
+        align(left, 
+          if lhead != none {
+            if lhead != "" {lhead} else {semester(date)}
+        }),
+        align(center, text(16pt)[
+          #if chead != "" {chead} else if course != "" [#course --- #kind] else [#kind]
+        ]),
+        align(right, 
+          if rhead != none {
+            if rhead != "" {rhead} else {"Ver. " + version}
+        })
+      )
+      line(length: 100%);
     },
     header-ascent: 10%,
     footer: {
       set text(10pt, weight: "bold")
       grid(
         columns:(1fr, 5em, 1fr),
-        align(left)[
-          #if lfoot != none {
-            if lfoot != "" { lfoot } else { datedisp(date) }
-          }
-        ],
-        align(center)[
-          #counter(page).display("1 / 1", both: true)
-        ],
-        align(right)[
-          #if rfoot != none {
-            if rfoot != "" {rfoot} else { instructor }
-          }
-        ]
+        align: (left, center, right),
+        if lfoot != none {
+          if lfoot != "" { lfoot } else { datedisp(date) }
+        },
+        counter(page).display("1 / 1", both: true),
+        if rfoot != none {
+          if rfoot != "" {rfoot} else { instructor }
+        }
       )
     }
   )
@@ -163,8 +154,6 @@
     )
   }
   
-
-
   // End before-body
   
   // Main body.
