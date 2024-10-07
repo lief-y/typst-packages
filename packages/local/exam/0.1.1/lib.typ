@@ -99,6 +99,9 @@
       set text(weight: 600)
       if bonus == true {
         bonuscounter.step()
+        context {if bonuscounter.final().at(0) == 1 {
+          metadata("Bonus")
+        }}
         [Bonus Question ] + bonuscounter.display(questionnumbering)
       } else {
         qstcounter.step()
@@ -193,9 +196,15 @@
 
 #import "@preview/name-it:0.1.1": *
 
-#let pagetotal = locate(loc => name-it(counter(page).final(loc).at(0)))
-#let questiontotal = locate(loc => name-it(qstcounter.final(loc).at(0)))
-#let pointtotal = locate(loc => total_points.final(loc))
+#let pagetotal = context{
+  name-it(
+  if bonuscounter.final().first() > 0 { 
+    query(metadata.where(value: "Bonus")).first().location().page() - 3
+  } else {counter(page).final().first()}
+  )
+}
+#let questiontotal = context{ name-it(qstcounter.final().first()) }
+#let pointtotal = context{ total_points.final() }
 
 
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
@@ -223,8 +232,29 @@
 
   if coverpage {
     set text(size: 11pt)
+    let cell(content) = {
+      set align(left)
+      rect(
+        width: 100%,
+        height: 100%,
+        inset: 0.5em,
+        stroke: 1.5pt, //(left: 1pt, right: 1pt),
+        [
+          #set text(14pt, weight: "medium")
+          #content
+        ]
+      )
+    }
     set page(
-    margin: 1in,
+      margin: (top: 1.2in),
+      header:   grid(
+        columns: (1fr, 1fr, 1fr),
+        align: top,
+        rows: (0.6in),
+        cell()[#smallcaps("Name (PRINT):")],
+        cell()[#smallcaps("ID:")],
+        cell()[#smallcaps("Signature:")],
+      ),
       footer: {
           grid(
             align: (left, center, right),
@@ -235,30 +265,7 @@
           )
         }
     )
-    // v(1in)
 
-  let cell(content) = {
-    set align(left)
-    rect(
-      width: 100%,
-      height: 100%,
-      inset: 0.5em,
-      stroke: 1.5pt, //(left: 1pt, right: 1pt),
-      [
-        #set text(14pt, weight: "medium")
-        #content
-      ]
-    )
-  }
-  
-  // print namebox
-  grid(
-    columns: (1fr, 1fr, 1fr),
-    rows: (0.6in),
-    cell()[#smallcaps("Name (PRINT):")],
-    cell()[#smallcaps("ID:")],
-    cell()[#smallcaps("Signature:")],
-  )
 
   align(center, text(18pt, weight: "semibold", {
     if coursenumber != "" { coursenumber }
@@ -272,10 +279,10 @@
 
   if intro != none {
     block(
-      // fill: rgb("#98e3fd").lighten(70%), 
+      // fill: rgb("#98e3fd").lighten(70%),
+      above: 1em,
       inset: 0.5em, 
       width: 100%, 
-      above: 0.5em,
       radius: 0.3em, 
       stroke: none
     )[
@@ -285,7 +292,7 @@
         justify: true
       )    
       #pad(x: 0.5em)[
-        #text(14pt, weight: "bold")[Introduction]
+        #text(14pt, weight: "bold")[Instructions and Policies]
         
         #intro
       ]
