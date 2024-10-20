@@ -105,7 +105,7 @@
         [Bonus Question ] + bonuscounter.display(questionnumbering)
       } else {
         qstcounter.step()
-        qstcounter.display(questionnumbering)
+        context(qstcounter.display(questionnumbering))
       }
       set text(weight: "regular")
       content
@@ -117,7 +117,7 @@
   #pointgrid({
       set text(weight: 600)
       qstcounter.step()
-      qstcounter.display(questionnumbering)
+      context(qstcounter.display(questionnumbering))
       title
     },
     points, bonusqst: bonus
@@ -131,7 +131,7 @@
   #pointgrid({
       qstcounter.step(level: level)
       h(1.5em)
-      qstcounter.display(questionnumbering)
+      context(qstcounter.display(questionnumbering))
       body
     },
     points,
@@ -146,12 +146,12 @@
   Optional you can give a placeholder which will be printed if show_sol is false.
 */
 #let solution(solution, placeholder: []) = {
-    locate(loc => {
-      if show_sol.at(loc) == false { placeholder }
-    })
+    context {
+      if show_sol.get() == false { placeholder }
+    }
     set text(fill: rgb( 55, 43, 251 ))
-    locate(loc => {
-      if show_sol.at(loc) == true {
+    context {
+      if show_sol.get() == true {
         block(
           width: 100%, 
           inset: 1em,
@@ -163,7 +163,7 @@
           }
         )
       }
-    })
+    }
 }
 
 /*
@@ -375,7 +375,7 @@
           }
         ],
         align(center)[
-          #counter(page).display("1 / 1", both: true)
+          #context(counter(page).display("1 / 1", both: true))
         ],
         align(right)[
           #if rfoot != none {
