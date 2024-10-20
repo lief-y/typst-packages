@@ -40,6 +40,7 @@
 // Global state 
 #let show_sol = state("s", false)
 #let total_points = state("t", 0)
+#let total_bonus = state("t", 0)
 
 #let qstcounter = counter("question-counter");
 #let bonuscounter = counter("bonus-counter");
@@ -94,15 +95,16 @@
 }
 
 #let question(points: none, title: "", bonus: false, content) = {
+  if bonus == false {metadata("question")}
+  
   if title == "" [
     #pointgrid({
       set text(weight: 600)
       if bonus == true {
         bonuscounter.step()
-        context {if bonuscounter.final().at(0) == 1 {
-          metadata("Bonus")
-        }}
-        [Bonus Question ] + bonuscounter.display(questionnumbering)
+        metadata("Bonus")
+        total_bonus.update(t => t + points)
+        [Bonus Question ] + context(bonuscounter.display(questionnumbering))
       } else {
         qstcounter.step()
         context(qstcounter.display(questionnumbering))
@@ -120,7 +122,8 @@
       context(qstcounter.display(questionnumbering))
       title
     },
-    points, bonusqst: bonus
+    points, 
+    bonusqst: bonus
   )
   #pad(left:1em, top:-0.5em)[#content]
 ]
@@ -198,9 +201,9 @@
 
 #let pagetotal = context{
   name-it(
-  if bonuscounter.final().first() > 0 { 
-    query(metadata.where(value: "Bonus")).first().location().page() - 3
-  } else {counter(page).final().first()}
+    if bonuscounter.final().first() > 0 { 
+      query(metadata.where(value: "Bonus")).first().location().page() - 2
+    } else {counter(page).final().first()}
   )
 }
 #let questiontotal = context{ name-it(qstcounter.final().first()) }
@@ -302,42 +305,94 @@
 // create grading table
   context {
     let totalquestions = qstcounter.final().first()
-  
+
+    let qscores =()
+    let questionscore = for n in range(0, totalquestions) {
+      n = n + 1
+      let qn = query(metadata.where(value: "question")).at(n - 1).location()      
+      let qnplus1 = if n == totalquestions {
+        if query(metadata.where(value: "Bonus")).len() > 0 {
+          query(metadata.where(value: "Bonus")).first().location()
+        } else {
+          query(metadata.where(value: "endofexam")).first().location()
+        }
+      } else {
+        query(metadata.where(value: "question")).at(n).location()
+      }
+
+      let qnscore = if n == 0 {
+        total_points.at(qnplus1)
+      } else {
+        total_points.at(qnplus1) - total_points.at(qn)
+      } 
+      qscores = qscores + (qnscore,)
+    }
+    
     let questions = for n in range(0, totalquestions) {
       n = n + 1
-      ([*Q#n*],)
+      ([*Q#n*\ (#qscores.at(n - 1) pts)],)
     }
+
+    let totalbonusquetions = bonuscounter.final().first()
+
+    let bonusscore =()
+    let questionscore = for n in range(0, totalbonusquetions) {
+      n = n + 1
+      let bqn = query(metadata.where(value: "Bonus")).at(n - 1).location()      
+      let bqnplus1 = if n == totalbonusquetions {
+        query(metadata.where(value: "endofexam")).first().location()
+      } else {
+        query(metadata.where(value: "Bonus")).at(n).location()
+      }
+
+      let bqnscore = if n == 0 {
+        total_points.at(bqnplus1)
+      } else {
+        total_points.at(bqnplus1) - total_points.at(bqn)
+      } 
+      bonusscore = bonusscore + (bqnscore,)
+    }
+
+    let bonusquestions = for n in range(0, totalbonusquetions) {
+      n = n + 1
+      ([*Bonus #n*\ (#bonusscore.at(n - 1) pts)],)
+    }
+    
+    let totalofall = totalquestions + totalbonusquetions
+
+    let questionsandbonus = questions + bonusquestions
+
+    let totalrows = calc.ceil((totalofall) / 6)
+
+    let questionarray = questionsandbonus.slice(0, calc.min(totalofall, 6)) + ([],)*(6 - calc.min(totalofall, 6)) + ([],) * 6
   
-    let totalrows = calc.ceil(totalquestions / 5)
-    let questionarray = ([*Qst. \#*],) + questions.slice(0, calc.min(totalquestions, 5)) + ([],)*(5 - calc.min(totalquestions, 5)) + ([*Score*],)+ ([],) * 5
-  
-    let tq = totalquestions
+    let tq = totalofall
     while totalrows > 1 {
-      questions = questions.slice(5)
-      tq = tq - 5
-      questionarray = questionarray + ([*Qst. \#*],) + questions.slice(0, calc.min(tq, 5)) + ([],)*(5 - calc.min(tq, 5)) + ([*Score*],) + ([],) * 5
+      questionsandbonus = questionsandbonus.slice(6)
+      tq = tq - 6
+      questionarray = questionarray + questionsandbonus.slice(0, calc.min(tq, 6)) + ([],)*(6 - calc.min(tq, 6))  + ([],) * 6
       totalrows = totalrows - 1
     }
 
-    // let numcols = 1 + calc.min(totalquestions, 5)
 
     v(1fr)
     table(
       columns: (1fr, ) * 6,
       align: center+horizon,
       stroke: 1.5pt,
-      rows: 2.5em,
+      rows: 3em,
       ..questionarray,
-      table.cell(colspan: 3, align: right, stroke: (left: none, bottom: none))[],
-      table.cell(colspan: 2, inset: 0.5em, text(1.6em)[*Total Score:*]),
-      []
+      table.cell(colspan: 2, align: right, stroke: (left: none, bottom: none))[],
+      table.cell(colspan: 2, inset: 0.5em, text(1.6em)[*Total Score :*]),
+      table.cell(colspan: 2, inset: 0.5em, [#h(1fr) / #pointtotal])
     )
+    v(0.5em)
   }
   
   pagebreak()
   set page(header: none, footer: none)
   
-  counter(page).update(0)
+  counter(page).update(1)
 }
 
   // Set page, headers and footers for the main body
@@ -362,9 +417,10 @@
             if rhead != "" {rhead} else {"Ver. " + version}
         }
       )
-      line(length: 100%);
+      line(length: 100%)
     },
-    header-ascent: 10%,
+    header-ascent: 15%,
+    // footer-descent: 40%,
     footer: {
       set text(10pt, weight: "bold")
       grid(
