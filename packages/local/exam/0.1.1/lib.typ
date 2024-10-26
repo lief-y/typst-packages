@@ -408,7 +408,7 @@
         columns: (1fr, 2.5fr, 1fr),
         align: (left, center, right),
         if lhead != none {
-            if lhead != "" {lhead} else {date}
+            if lhead != "" {lhead} else {semester(date)}
         },
         text(16pt)[
               #if chead != "" {chead} else if coursetitle != "" [#coursetitle #if college!= "" {} else {linebreak()} #kind] else [#kind]
