@@ -40,7 +40,7 @@
 // Global state 
 #let show_sol = state("s", false)
 #let total_points = state("t", 0)
-#let total_bonus = state("t", 0)
+#let total_bonus = state("b", 0)
 
 #let qstcounter = counter("question-counter");
 #let bonuscounter = counter("bonus-counter");
@@ -65,19 +65,19 @@
 
 #let pointbox(points, plural: false, total_include: true) = {
   assert.eq(type(points),"integer")
-  if total_include == true {
+  if total_include {
     total_points.update(t => t + points)
   }
   box(
-      // stroke: blue,
-      inset: 2pt,
-      radius: 0.2em,
-      fill: rgb("#98e3fd").lighten(50%)
-    )[
-        #set align(center + horizon)
-        #set text(weight: "regular")
-        #points #smallcaps[pt#if points > 1 [s]]
-    ]
+    inset: 2pt,
+    radius: 0.2em,
+    fill: rgb("#98e3fd").lighten(50%),
+    {
+      set text(weight: "regular")
+      set align(center + horizon)
+      [#points #smallcaps[pt#if points > 1 [s]]]
+    }
+  )
 }
 
 /*
@@ -89,58 +89,42 @@
     gutter: 1em,
     body,
     if points != none {
-        pointbox(points, total_include: not(bonusqst))
+        pointbox(points, total_include: not bonusqst)
     }
   )
 }
 
 #let question(points: none, title: "", bonus: false, content) = {
-  if bonus == false {metadata("question")}
-  
-  if title == "" [
-    #pointgrid({
+    pointgrid({
       set text(weight: 600)
-      if bonus == true {
-        bonuscounter.step()
-        metadata("Bonus")
-        total_bonus.update(t => t + points)
-        [Bonus Question ] + context(bonuscounter.display(questionnumbering))
-      } else {
+      if bonus == false {
+        metadata("question")
         qstcounter.step()
         context(qstcounter.display(questionnumbering))
-      }
-      set text(weight: "regular")
-      content
+      } else {
+        metadata("Bonus")
+        bonuscounter.step()
+        total_bonus.update(b => b + points)
+        [Bonus Question ] + context(bonuscounter.display(questionnumbering))
+      } + if title == "" {text(weight: "regular", content)} else {title}
     },
     points, 
     bonusqst: bonus
   )
-  ] else [
-  #pointgrid({
-      set text(weight: 600)
-      qstcounter.step()
-      context(qstcounter.display(questionnumbering))
-      title
-    },
-    points, 
-    bonusqst: bonus
-  )
-  #pad(left:1em, top:-0.5em)[#content]
-]
+  if title != "" {
+    pad(left: 1em, text(weight: "regular", content))
+  }
 }
 
-#let part(body, points: none, bonus: false, level: 2) = [
-  #set text(weight: "regular")
-  #pointgrid({
-      qstcounter.step(level: level)
-      h(1.5em)
-      context(qstcounter.display(questionnumbering))
-      body
+#let part(body, points: none, bonus: false, level: 2) = {
+  pointgrid({
+      qstcounter.step(level: level) 
+      pad(left: 1em, context(qstcounter.display(questionnumbering)) + body)
     },
     points,
     bonusqst: bonus
   )
-]
+}
 
 /*
   solution for a question
@@ -186,7 +170,7 @@
   #for (i,a) in choices.enumerate() [
       #box(inset: (x: 0.5em))[
         #locate(loc => {
-         square(
+        square(
           width: 0.8em, 
           height: 0.8em, 
           stroke: black, 
@@ -200,14 +184,26 @@
 #import "@preview/name-it:0.1.1": *
 
 #let pagetotal = context{
-  name-it(
-    if bonuscounter.final().first() > 0 { 
-      query(metadata.where(value: "Bonus")).first().location().page() - 2
-    } else {counter(page).final().first()}
-  )
+  let firstqstpage = {
+    if qstcounter.final().first() > 0 {
+      query(metadata.where(value: "question")).first().location().page()
+    } else {
+      query(metadata.where(value: "startofexam")).first().location().page()
+    }
+  }
+
+  let totalpagesofquestions = {if bonuscounter.final().first() > 0 { 
+      query(metadata.where(value: "Bonus")).first().location().page() - firstqstpage
+    } else {counter(page).final().first() - firstqstpage}
+  }
+
+  name-it(totalpagesofquestions)
 }
+
 #let questiontotal = context{ name-it(qstcounter.final().first()) }
-#let pointtotal = context{ total_points.final() }
+#let pointtotal = context{
+  total_points.final()
+}
 
 
 #set par(leading: 0.55em, first-line-indent: 1.8em, justify: true)
@@ -339,17 +335,17 @@
     let questionscore = for n in range(0, totalbonusquetions) {
       n = n + 1
       let bqn = query(metadata.where(value: "Bonus")).at(n - 1).location()      
-      let bqnplus1 = if n == totalbonusquetions {
+      let bqnplus1 = {if n == totalbonusquetions {
         query(metadata.where(value: "endofexam")).first().location()
       } else {
         query(metadata.where(value: "Bonus")).at(n).location()
-      }
+      }}
 
-      let bqnscore = if n == 0 {
-        total_points.at(bqnplus1)
+      let bqnscore = {if n == 0 {
+        total_bonus.at(bqnplus1)
       } else {
-        total_points.at(bqnplus1) - total_points.at(bqn)
-      } 
+        total_bonus.at(bqnplus1) - total_bonus.at(bqn)
+      }}
       bonusscore = bonusscore + (bqnscore,)
     }
 
@@ -492,6 +488,9 @@
   show enum: inline_list.with(numbering.with("1)"))
 
   // Content-Body
+
+  metadata("startofexam")
+
   body
 
   metadata("endofexam")
