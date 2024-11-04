@@ -390,10 +390,14 @@
   }
   
   pagebreak()
+
   set page(header: none, footer: none)
   
+  pagebreak()
   counter(page).update(1)
 }
+
+
 
   // Set page, headers and footers for the main body
 
