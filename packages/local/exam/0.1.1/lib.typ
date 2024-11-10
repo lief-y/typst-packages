@@ -469,7 +469,7 @@
       grid(
         columns: (1fr,) * calc.min(it.children.len(), 4),
         column-gutter: 0.5em,
-        row-gutter: 1.2em,
+        row-gutter: 1.8em,
         ..it.children
             .enumerate()
             .map(((n, item)) => grid(
