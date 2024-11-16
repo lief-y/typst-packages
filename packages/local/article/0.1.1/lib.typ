@@ -5,7 +5,7 @@
 // Font settings
 #let font_families = state("usrfonts", ("default", "default", "default"))
 
-#let title_font = state("titlefonts", ("Noto Serif", "New Computer Modern"))
+#let title_font = state("titlefonts", ("Noto Sans", "New Computer Modern"))
 #let body_font = state("bodyfonts",("Noto Sans", "New Computer Modern Sans"))
 #let math_font = state("mathfont", ("STIX Two Math", "New Computer Modern Math"))
 
@@ -53,8 +53,8 @@
     }).map(it => emph(it))
     } else { none }
 
-  return block(spacing: 0em, above: 1.2em, {
-    set par(justify: true, leading: 0.50em, spacing: 0.5em)
+  return block(spacing: 0em, above: 2em, {
+    set par(justify: true, leading: 0.65em, spacing: 0.65em)
     text(size: fontsize.normal)[*#author.name*]
     {
       set text(size: fontsize.small)
@@ -127,7 +127,7 @@
   (
     name: "Fei Ye", 
     email: "feye@qcc.cuny.edu",
-    url: "https:yfei.page",
+    url: "https://yfei.page",
     affl: ("qcc", "gc")
   ),
 )
@@ -145,15 +145,16 @@
   bibliography: none,
   body,
 ) = context {
-  if font_families.get() != ("default", "default", "default") {
-    if font_families.get().at(0) != "default" {
-      title_font.update(font_families.get().at(0))
+  if font_families.get() != none and font_families.get() != ("default", "default", "default") {
+    let fontfamilies = font_families.get()
+    if fontfamilies.at(0) != "default" {
+        title_font.update(t => (fontfamilies.at(0), ) + t)
     }
-    if font_families.get().at(1) != "default" {
-      body_font.update(font_families.get().at(1))
+    if fontfamilies.at(1) != "default" {
+      body_font.update(t => (fontfamilies.at(1), ) + t)
     }
-    if font_families.get().at(2) != "default" {
-      math_font.update(font_families.get().at(2))
+    if fontfamilies.at(2) != "default" {
+      math_font.update(t => (fontfamilies.at(2), ) + t)
     }
   }
   // Prepare authors for PDF metadata
