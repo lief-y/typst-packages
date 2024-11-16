@@ -5,7 +5,7 @@
 // Font settings
 #let font_families = state("usrfonts", ("default", "default", "default"))
 
-#let title_font = state("titlefonts", ("Noto Serif", "New Computer Modern"))
+#let title_font = state("titlefonts", ("Noto Sans", "New Computer Modern"))
 #let body_font = state("bodyfonts",("Noto Sans", "New Computer Modern Sans"))
 #let math_font = state("mathfont", ("STIX Two Math", "New Computer Modern Math"))
 
@@ -27,16 +27,18 @@
   namefmt: x => context {text(font: title_font.get(), [(#x)])},   
   titlefmt: x => context {text(font: title_font.get(), strong(x))},
   inset: 0em,
+  breakable: true,
 )
 
 // Define theorem environments
-#let theorem = thmbox("theorem", "Theorem",   bodyfmt: x => emph(x), ..thmstyle)
+#let theorem = thmbox("theorem", [Theorem],   bodyfmt: x => emph(x), ..thmstyle)
 #let lemma = thmbox("theorem", [Lemma],   bodyfmt: x => emph(x), ..thmstyle)
 #let proposition = thmbox("theorem", [Proposition],   bodyfmt: x => emph(x), ..thmstyle)
 #let corollary = thmbox("theorem", [Corollary],  bodyfmt: x => emph(x), ..thmstyle)
-#let remark = thmbox("remark", [Remark], ..thmstyle)
+
 #let definition = thmbox("definition", [Definition], ..thmstyle)
-#let example = thmplain("example", [Example], ..thmstyle)
+#let remark = thmbox("remark", [Remark], ..thmstyle)
+#let example = thmbox("example", [Example], ..thmstyle)
 #let proof = thmproof("proof", [Proof], ..thmstyle)
 
 // Author and affiliation settings
@@ -53,8 +55,8 @@
     }).map(it => emph(it))
     } else { none }
 
-  return block(spacing: 0em, above: 1.2em, {
-    set par(justify: true, leading: 0.50em, spacing: 0.5em)
+  return block(spacing: 0em, above: 2em, {
+    set par(justify: true, leading: 0.65em, spacing: 0.65em)
     text(size: fontsize.normal)[*#author.name*]
     {
       set text(size: fontsize.small)
@@ -127,7 +129,7 @@
   (
     name: "Fei Ye", 
     email: "feye@qcc.cuny.edu",
-    url: "https:yfei.page",
+    url: "https://yfei.page",
     affl: ("qcc", "gc")
   ),
 )
@@ -145,23 +147,31 @@
   bibliography: none,
   body,
 ) = context {
-  if font_families.get() != ("default", "default", "default") {
-    if font_families.get().at(0) != "default" {
-      title_font.update(font_families.get().at(0))
+  if font_families.get() != none and font_families.get() != ("default", "default", "default") {
+    let fontfamilies = font_families.get()
+    if fontfamilies.at(0) != "default" {
+        title_font.update(t => (fontfamilies.at(0), ) + t)
     }
-    if font_families.get().at(1) != "default" {
-      body_font.update(font_families.get().at(1))
+    if fontfamilies.at(1) != "default" {
+      body_font.update(t => (fontfamilies.at(1), ) + t)
     }
-    if font_families.get().at(2) != "default" {
-      math_font.update(font_families.get().at(2))
+    if fontfamilies.at(2) != "default" {
+      math_font.update(t => (fontfamilies.at(2), ) + t)
     }
   }
   // Prepare authors for PDF metadata
-  let author = authors.first().map(it => it.name)
+  let author_names(capitalized: false) = authors.first().map(author => if capitalized {upper(author.name)} else {author.name})
+  let author_list(uppercase: false) = {
+    if author_names(capitalized: uppercase).len() == 2 {
+      author_names(capitalized: uppercase).join(" and ")
+    } else {
+      author_names(capitalized: uppercase).join(", ", last: ", and ")
+    }
+  }
 
   set document(
     title: title,
-    author: author,
+    author: author_list(),
     keywords: keywords,
     date: date
   )
@@ -169,21 +179,37 @@
   set page(
     paper: "us-letter",
     margin: (x: 1in, top: 1.18in, bottom: 11in - (1.18in + 9in)),
-    header-ascent: 46pt,
-    footer-descent: 20pt,
-    footer: align(center, text(size: fontsize.normal, context{counter(page).display("1 / 1", both:true)}))
+    header-ascent: 16pt,
+    header: context {
+      let i = counter(page).get().first()
+      if i == 1 { return }
+      set text(size: fontsize.small, weight: 500)
+      if calc.even(i) {[#i]+h(1fr)+author_list(uppercase: true)} else {upper(title)+h(1fr)+[#i]}
+    },
+    footer-descent: 12pt,
+    footer: context {
+      let i = counter(page).get().first()
+      if i == 1 {
+        align(center, text(size: fontsize.small)[#i])
+      }
+    }
   )
 
   set text(font: body_font.get(), size: fontsize.normal)
   show math.equation: set text(font: math_font.get(), weight: 400)
   
-  set block(above: 0.65em, below: 0.65em)
+  // set block(above: 0.65em, below: 0.65em)
 
   show link: set text(blue)
   
-  set par(first-line-indent: 1.2em, justify: true, leading: 0.58em, spacing: (1.75*0.58em))
+  set par(
+    first-line-indent: 1.2em, 
+    justify: true, 
+    leading: 0.58em, 
+    spacing: (1.5*0.58em)
+  )
   set heading(numbering: "1.1"+".")
-  show heading: set text(font: title_font.get(), weight: 500)
+  show heading: set text(font: title_font.get(), weight: 600)
   show heading: set block(spacing: 1.15em)
   
   show raw: set block(spacing: 1.95em)
@@ -202,10 +228,10 @@
   show figure.where(kind: table): set figure(gap: 6pt)
   set table(inset: 4pt)
 
-  set enum(indent: 2.4em, spacing: 1.3em)
+  set enum(indent: 1.2em, spacing: 1.3em)
   show enum: set block(above: 2em)
 
-  set list(indent: 2.4em, spacing: 1.3em, marker: ([•], [‣], [⁃]))
+  set list(indent: 1.2em, spacing: 1.3em, marker: ([•], [‣], [⁃]))
   show list: set block(above: 2em)
 
   set math.equation(numbering: "(1)", supplement: [])
