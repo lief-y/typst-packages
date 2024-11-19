@@ -10,7 +10,7 @@
 #let math_font = state("mathfont", ("STIX Two Math", "New Computer Modern Math"))
 
 #let fontsize = (
-  Large: 17pt,
+  Large: 18pt,
   footnote: 10pt,
   large: 12pt,
   normal: 10.5pt,
@@ -89,10 +89,10 @@
   block(spacing: 0em, {
     set block(spacing: 0em)
     set par(leading: 10pt)
-    text(size: fontsize.Large, weight: "bold", title)
+    text(size: fontsize.Large, weight: 600, upper(title))
   })
   v(31pt, weak: true)
-  authors.first().map(it => it.name).join(", ", last: ", and")
+  authors.first().map(it => upper(it.name)).join(", ", last: ", and")
   v(14.9pt, weak: true)
   if date == none {return} else {date.display("[month repr:short] [day], [year]")}
   v(14.9pt, weak: true)
@@ -101,10 +101,10 @@
 // Render abstract
 #let make-abstract(abstract) = context {
   block(spacing: 0em, width: 100%, {
-    set text(size: font.normal)
-    set par(leading: 0.51em)
+    v(29.5pt, weak: true)
     align(center, text(font: title_font.get(), size: fontsize.large, weight: "bold", [*Abstract*]))
-    v(22.2pt, weak: true)
+    set text(size: fontsize.normal)
+    set par(leading: 0.51em)
     pad(left: 0.5in, right: 0.5in, abstract)
   })
   v(29.5pt, weak: true)
@@ -202,17 +202,27 @@
 
   show link: set text(blue)
   
+
   set par(
-    first-line-indent: 1.2em, 
-    justify: true, 
-    leading: 0.58em, 
-    spacing: (1.5*0.58em)
+      // first-line-indent: 1.15em, 
+      justify: true, 
+      leading: 0.58em, 
+      spacing: (1.2em),
+      // hanging-indent: -1em
   )
+
+  
+
   set heading(numbering: "1.1"+".")
-  show heading: set text(font: title_font.get(), weight: 600)
-  show heading: set block(spacing: 1.15em)
+  show heading: it => {
+    set text(font: title_font.get(), weight: 600)
+    set block(spacing: 0em)
+    v(1.15em, weak: true)
+    it + h(0em, weak: true)
+  }
   
   show raw: set block(spacing: 1.95em)
+
   show footnote.entry: set text(size: 8pt)
   set footnote.entry(
     separator: line(length: 2in, stroke: 0.35pt),
