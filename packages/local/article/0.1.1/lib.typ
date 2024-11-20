@@ -1,6 +1,6 @@
 // This template is derived from https://github.com/daskol/typst-templates/blob/main/tmlr/tmlr.typ
 
-#let std-bibliography = bibliography
+#let thebibliography = bibliography
 
 // Font settings
 #let font_families = state("usrfonts", ("default", "default", "default"))
@@ -144,6 +144,7 @@
   MRC: (),
   date: datetime.today(),
   abstract: none,
+  citestyle: "springer-basic-author-date",
   bibliography: none,
   body,
 ) = context {
@@ -273,7 +274,7 @@
     link(uri, raw(uri))
   }
 
-  set cite(style: "alphanumeric")
+  // set cite(style: "alphanumeric")
   show cite: set text(blue)
 
   // Render body
@@ -281,8 +282,9 @@
 
   set par(first-line-indent: 0em) 
   // Render bibliography if provided
+
   if bibliography != none {
-    set std-bibliography(title: [References])
+    set thebibliography(title: [References], style: "alphanumeric")
     set text(font: body_font.get(), size: fontsize.normal)
     bibliography
   }
