@@ -37,6 +37,7 @@
 #let corollary = thmbox("theorem", [Corollary],  bodyfmt: x => emph(x), ..thmstyle)
 
 #let definition = thmbox("definition", [Definition], ..thmstyle)
+#let conjecture = thmbox("conjecture", [Conjecture], ..thmstyle)
 #let remark = thmbox("remark", [Remark], ..thmstyle)
 #let example = thmbox("example", [Example], ..thmstyle)
 #let proof = thmproof("proof", [Proof], ..thmstyle)
@@ -208,7 +209,7 @@
       // first-line-indent: 1.15em, 
       justify: true, 
       leading: 0.58em, 
-      spacing: (1.2em),
+      spacing: (1.15em),
       // hanging-indent: -1em
   )
 
@@ -237,13 +238,9 @@
 
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set figure(gap: 6pt)
-  set table(inset: 4pt)
 
-  set enum(indent: 1.2em, spacing: 1.3em)
-  show enum: set block(above: 2em)
-
-  set list(indent: 1.2em, spacing: 1.3em, marker: ([•], [‣], [⁃]))
-  show list: set block(above: 2em)
+  set enum(indent: 1.2em, spacing: 1.15em)
+  set list(indent: 1.2em, spacing: 1.15em, marker: ([•], [‣], [-]))
 
   set math.equation(numbering: "(1)", supplement: [])
   show ref: it => {
@@ -262,20 +259,17 @@
     }
   }
 
+  show: mythmrules
+  
+  // set cite(style: "alphanumeric")
+  show cite: set text(blue)
+
   // Render title, authors, and abstract
   make-title(title, authors, date)
+
   if abstract != none {
     make-abstract(abstract)
   }
-
-  show: mythmrules
-  
-  let url(uri) = {
-    link(uri, raw(uri))
-  }
-
-  // set cite(style: "alphanumeric")
-  show cite: set text(blue)
 
   // Render body
   body
@@ -284,7 +278,7 @@
   // Render bibliography if provided
 
   if bibliography != none {
-    set thebibliography(title: [References], style: "alphanumeric")
+    set thebibliography(title: [References], style: "din-alphanumeric.csl")
     set text(font: body_font.get(), size: fontsize.normal)
     bibliography
   }
