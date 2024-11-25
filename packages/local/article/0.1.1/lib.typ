@@ -38,6 +38,7 @@
 
 #let definition = thmbox("definition", [Definition], ..thmstyle)
 #let conjecture = thmbox("conjecture", [Conjecture], ..thmstyle)
+#let question = thmbox("question", [Question], ..thmstyle)
 #let remark = thmbox("remark", [Remark], ..thmstyle)
 #let example = thmbox("example", [Example], ..thmstyle)
 #let proof = thmproof("proof", [Proof], ..thmstyle)
@@ -180,7 +181,7 @@
 
   set page(
     paper: "us-letter",
-    margin: (x: 1in, top: 1.18in, bottom: 11in - (1.18in + 9in)),
+    // margin: (x: 1in, top: 1.18in, bottom: 11in - (1.18in + 9in)),
     header-ascent: 16pt,
     header: context {
       let i = counter(page).get().first()
@@ -213,7 +214,6 @@
       // hanging-indent: -1em
   )
 
-  
 
   set heading(numbering: "1.1"+".")
   show heading: it => {
