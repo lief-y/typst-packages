@@ -18,6 +18,8 @@
   small: 9pt,
 )
 
+#let parspacing = 1.15em
+
 // Import theorem styles
 #import "@preview/ctheorems:1.1.3": *
 
@@ -28,6 +30,7 @@
   titlefmt: x => context {text(font: title_font.get(), strong(x))},
   inset: 0em,
   breakable: true,
+  padding: (top:0em, bottom:0em),
 )
 
 // Define theorem environments
@@ -63,15 +66,15 @@
     {
       set text(size: fontsize.small)
       if addresses != none {
-        v(0.5em)
+        v(parspacing/2)
         addresses.join([#v(0.5em)])
       }
       if "email" in author {
-        v(0.5em)
+        v(parspacing/2)
         [_Email address:_ ] + link("mailto:" + author.email)
       }
       if "url" in author {
-        v(0.5em)
+        v(parspacing/2)
         [_Homepage:_ ] + link(author.url)
       }
     }
@@ -93,23 +96,23 @@
     set par(leading: 10pt)
     text(size: fontsize.Large, weight: 600, upper(title))
   })
-  v(31pt, weak: true)
+  v(2*parspacing, weak: true)
   authors.first().map(it => upper(it.name)).join(", ", last: ", and")
-  v(14.9pt, weak: true)
+  v(parspacing, weak: true)
   if date == none {return} else {date.display("[month repr:short] [day], [year]")}
-  v(14.9pt, weak: true)
+  v(parspacing, weak: true)
 }
 
 // Render abstract
 #let make-abstract(abstract) = context {
   block(spacing: 0em, width: 100%, {
-    v(29.5pt, weak: true)
+    v(parspacing, weak: true)
     align(center, text(font: title_font.get(), size: fontsize.large, weight: "bold", [*Abstract*]))
     set text(size: fontsize.normal)
     set par(leading: 0.51em)
     pad(left: 0.5in, right: 0.5in, abstract)
   })
-  v(29.5pt, weak: true)
+  v(parspacing, weak: true)
 }
 
 // Affiliation details
@@ -146,8 +149,8 @@
   MRC: (),
   date: datetime.today(),
   abstract: none,
-  citestyle: "springer-basic-author-date",
   bibliography: none,
+  showcontacts: true,
   body,
 ) = context {
   if font_families.get() != none and font_families.get() != ("default", "default", "default") {
@@ -205,12 +208,11 @@
 
   show link: set text(blue)
   
-
   set par(
       // first-line-indent: 1.15em, 
       justify: true, 
       leading: 0.58em, 
-      spacing: (1.15em),
+      spacing: parspacing,
       // hanging-indent: -1em
   )
 
@@ -219,7 +221,7 @@
   show heading: it => {
     set text(font: title_font.get(), weight: 600)
     set block(spacing: 0em)
-    v(1.15em, weak: true)
+    v(parspacing, weak: true)
     it + h(0em, weak: true)
   }
   
@@ -239,8 +241,8 @@
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set figure(gap: 6pt)
 
-  set enum(indent: 1.2em, spacing: 1.15em)
-  set list(indent: 1.2em, spacing: 1.15em, marker: ([•], [‣], [-]))
+  set enum(indent: 1.2em, spacing: parspacing)
+  set list(indent: 1.2em, spacing: parspacing, marker: ([•], [‣], [-]))
 
   set math.equation(numbering: "(1)", supplement: [])
   show ref: it => {
@@ -284,5 +286,7 @@
   }
 
   // Render author contacts
-  make-contacts(..authors)
+  if showcontacts {
+    make-contacts(..authors)
+  }
 }
