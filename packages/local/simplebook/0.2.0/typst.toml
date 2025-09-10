@@ -1,0 +1,4 @@
+[package]
+name = "simplebook"
+version = "0.2.0"
+entrypoint = "lib.typ"
