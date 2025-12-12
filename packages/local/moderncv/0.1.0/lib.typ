@@ -8,11 +8,8 @@
     if color == "" {
       image(path)
     } else {
-      image.decode(
-        read(path).replace(
-          "#CC5500",
-          color.to-hex(),
-        )
+      image(
+        bytes(read(path).replace("#CC5500", color.to-hex()))
       )
     }
   )
@@ -81,13 +78,13 @@
     headinglayout: "",
     primarycolor: rgb("#2e59a7"),
     accentcolor: rgb("#2e59a7"),
-    font: "Noto Sans",
+    fonts: (heading: "Noto Sans", body: "Noto Sans"),
     liststyle: "fancy"
     )+(:),
   body
 ) = {
   set text(
-    font: theme.font,
+    font: if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "body" in theme.fonts.keys() {theme.fonts.body} else {theme.fonts}} else {"Noto Sans"},
     lang: "en",
     size: 11pt,
     fallback: true
@@ -105,21 +102,23 @@
 
   set page(
     paper: "us-letter",
-    margin: (left: 0.6in, right: 0.6in, top: 0.6in, bottom: 0.6in),
+    margin: (left: 0.8in, right: 0.8in, top: 0.8in, bottom: 0.8in),
     footer: 
-      {set text(fill: accent_color, size: 8pt);
-      grid(
-        columns: (1fr,1fr,1fr),
-        align: (left, center, right),
-        smallcaps[#date],
-        counter(page).display("1 / 1", both: true),
-        smallcaps[
-          #author.firstname
-          #author.lastname
-          #sym.dot.c
-          #title
-        ],
-      )}
+      context{
+        set text(fill: accent_color, size: 8pt)
+        grid(
+          columns: (1fr,1fr,1fr),
+          align: (left, center, right),
+          smallcaps[#date],
+          counter(page).display("1 / 1", both: true),
+          smallcaps[
+            #author.firstname
+            #author.lastname
+            #sym.dot.c
+            #title
+          ],
+        )
+      }
   )
 
 
@@ -131,7 +130,7 @@
 
   // Set paragraph spacing
   
-  set block(above: 1em, below: 1.1em)
+  // set block(above: 1.2em, below: 1.2em)
   set par(justify: true)
 
   // Set heading styles
@@ -141,10 +140,12 @@
     outlined: false,
   )
 
-  show heading: set block(above: 1em)
+
+  // show heading: set block(above: 1em, below: 1.2em)
 
   show heading.where(level:1): it =>  {
     set text(
+      font: if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "heading" in theme.fonts.keys() {theme.fonts.heading} else {theme.fonts}} else {"Noto Sans"},
       size: 1.2em,
       weight: "bold",
       fill: primary_color
