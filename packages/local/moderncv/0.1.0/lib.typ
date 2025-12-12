@@ -81,6 +81,7 @@
     fonts: (heading: "Noto Sans", body: "Noto Sans"),
     liststyle: "fancy"
     )+(:),
+  layout: "",
   body
 ) = {
   set text(
@@ -99,10 +100,13 @@
     title: title,
   )
   // Set page style 
+  
+  set page(
+    paper: if layout != "" and ("paper" in layout.keys()) {layout.paper} else {"us-letter"},
+    margin: if layout != "" and ("margin" in layout.keys()) {layout.margin} else {0.8in},
+  )
 
   set page(
-    paper: "us-letter",
-    margin: (left: 0.8in, right: 0.8in, top: 0.8in, bottom: 0.8in),
     footer: 
       context{
         set text(fill: accent_color, size: 8pt)
@@ -140,13 +144,14 @@
     outlined: false,
   )
 
+  let heading_font = if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "heading" in theme.fonts.keys() {theme.fonts.heading} else {theme.fonts}} else {"Noto Sans"}
 
+  show heading: set text(font: heading_font,)
+  
   // show heading: set block(above: 1em, below: 1.2em)
 
   show heading.where(level:1): it =>  {
     set text(
-      font: if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "heading" in theme.fonts.keys() {theme.fonts.heading} else {theme.fonts}} else {"Noto Sans"},
-      size: 1.2em,
       weight: "bold",
       fill: primary_color
     )
@@ -221,9 +226,11 @@
 
 
   // Set name style
-  
+  let name_font = if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "name" in theme.fonts.keys() {theme.fonts.name} else {heading_font}} else {"Noto Sans"}
+
   let name =  {
       set text(
+        font: name_font,
         size: 2.5em, 
         weight: "bold", 
         fill: primary_color
@@ -299,14 +306,16 @@
       }
     )
   }
-  
+
   grid(
     columns: (1fr, 2fr),
     align: (left, right), 
     {name; positions},
     {address; contactinfo},
   )
+
   socialinfo
+
   body
 }
 
