@@ -38,6 +38,8 @@
 #let column_gutter = 1em
 #let parindent = 1.5em
 
+#let state_par_leading = state("par_leading", 0.65em)
+
 //Resume color
 #let state_primary_color = state(
   "primarycolor",
@@ -57,6 +59,10 @@
   "plain"
 )
 
+#let state_par_leading = state(
+  "par_leading",
+  1.2*0.65em
+)
 
 #let resume(
   title: "",
@@ -83,7 +89,7 @@
     )+(:),
   layout: "",
   body
-) = {
+) = context {
   set text(
     font: if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "body" in theme.fonts.keys() {theme.fonts.body} else {theme.fonts}} else {"Noto Sans"},
     lang: "en",
@@ -103,13 +109,13 @@
   
   set page(
     paper: if layout != "" and ("paper" in layout.keys()) {layout.paper} else {"us-letter"},
-    margin: if layout != "" and ("margin" in layout.keys()) {layout.margin} else {0.8in},
+    margin: if layout != "" and ("margin" in layout.keys()) {layout.margin} else {1in},
   )
 
   set page(
     footer: 
       context{
-        set text(fill: accent_color, size: 8pt)
+        set text(fill: accent_color, size: 9pt)
         grid(
           columns: (1fr,1fr,1fr),
           align: (left, center, right),
@@ -133,9 +139,16 @@
   state_liststyle.update(theme.liststyle)
 
   // Set paragraph spacing
-  
-  // set block(above: 1.2em, below: 1.2em)
-  set par(justify: true)
+
+  set block(spacing: 1.85*state_par_leading.get())
+
+  set par(
+    leading: state_par_leading.get(),
+    justify: true,
+    justification-limits: (
+      tracking: (min: -0.01em, max: 0.02em),
+    )
+  )
 
   // Set heading styles
   
@@ -148,8 +161,6 @@
 
   show heading: set text(font: heading_font,)
   
-  // show heading: set block(above: 1em, below: 1.2em)
-
   show heading.where(level:1): it =>  {
     set text(
       weight: "bold",
@@ -165,6 +176,7 @@
     } else {
       box(
         width: 100%,
+        baseline: 40%,
         stroke: (bottom: 3pt + gradient.linear(primary_color, white, angle: 0deg)),
         inset: (bottom: 0.5em),
         it.body
@@ -223,8 +235,7 @@
     spacing: 1.2em,
     tight: false
   )
-
-
+  
   // Set name style
   let name_font = if "fonts" in theme.keys() {if type(theme.fonts)==dictionary and "name" in theme.fonts.keys() {theme.fonts.name} else {heading_font}} else {"Noto Sans"}
 
@@ -370,25 +381,27 @@
   university: "",
   location: "", 
   description: ""
-) = {
+) = context {
   grid(
       columns: (left_column_width, auto, 1fr),
       align: (right, left, right),
       column-gutter: column_gutter,
-      row-gutter: 0.65em,
+      row-gutter: state_par_leading.get(),
       grid.cell(
-        rowspan: 2,
+        rowspan: if description == "" {2} else {3},
         date,
       ),
       strong(title),
       department,
       emph(university),
       location,
-      [],
       if description != "" {
         description
       }
     )
+    if description == "" {
+      v(-state_par_leading.get())
+    }
 }
 
 // Reverse the numbering of enum items. It was shared by frozolotl. A reimplement of enum can be found in https://gist.github.com/frozolotl/1eeafa5ff4a38b2aab412743bd9c1ded. It may be used to realize the same feature.
@@ -424,7 +437,7 @@
         }
       ]
     }, 
-    spacing: 1.2em,
+    spacing: 1.85*state_par_leading.get(),
     tight: false
   )
 
