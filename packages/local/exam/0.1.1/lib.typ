@@ -4,7 +4,7 @@
   weekdayname: true,
   date
 ) = {
-  if type(date) != "datetime" { 
+  if type(date) != datetime { 
     date 
   } else { 
     if weekdayname {
