@@ -1,4 +1,4 @@
-#import "@preview/ctheorems:1.1.2": *
+#import "@preview/ctheorems:1.1.3": *
 #let mythmrules(..args, doc) = thmrules(qed-symbol: $square$, doc)
 
 #import "@preview/fletcher:0.5.1" as fletcher: diagram, node, edge

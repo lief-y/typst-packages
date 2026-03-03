@@ -64,7 +64,7 @@
 */
 
 #let pointbox(points, plural: false, total_include: true) = {
-  assert.eq(type(points),"integer")
+  assert.eq(type(points), int)
   if total_include {
     total_points.update(t => t + points)
   }
@@ -256,7 +256,7 @@
       ),
       footer: {
           grid(
-            align: (left, center, right),
+            align: (left+horizon, center+horizon, right+horizon),
             columns: (1fr, 1fr,1fr),
             strong(semester(datetime.today())),
             lfoot,
@@ -410,7 +410,7 @@
         if lhead != none {
             if lhead != "" {lhead} else {semester(date)}
         },
-        text(16pt)[
+        text(14pt)[
               #if chead != "" {chead} else if coursetitle != "" [#coursetitle #if college!= "" {} else {linebreak()} #kind] else [#kind]
         ],
         if rhead != none {
@@ -425,19 +425,14 @@
       set text(10pt, weight: "bold")
       grid(
         columns:(1fr, 5em, 1fr),
-        align(left)[
-          #if lfoot != none {
+        align: (left+horizon, center+horizon, right+horizon),
+        if lfoot != none {
             if lfoot != "" { lfoot } else { datedisp(date) }
-          }
-        ],
-        align(center)[
-          #context(counter(page).display("1 / 1", both: true))
-        ],
-        align(right)[
-          #if rfoot != none {
+          },
+        context(counter(page).display("1 / 1", both: true)),
+        if rfoot != none {
             if rfoot != "" {rfoot} else { instructor }
           }
-        ]
       )
     }
   )
